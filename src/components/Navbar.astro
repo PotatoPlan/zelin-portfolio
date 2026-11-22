@@ -1,0 +1,104 @@
+---
+import { siteConfig } from '../data/site';
+import { resolveMediaUrl } from '../lib/media';
+
+const pathname = Astro.url.pathname;
+const portfolioPdfUrl = resolveMediaUrl(siteConfig.portfolioDownload.fileUrl);
+---
+
+<header class="sticky top-0 z-40 border-b border-secondary/15 bg-surface-950/85 backdrop-blur-md">
+  <div class="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+    <!-- Brand -->
+    <a href="/" class="group flex items-center gap-3">
+      <span class="flex h-8 w-8 items-center justify-center rounded-lg border border-secondary/35 bg-surface-850/90 font-mono text-xs font-medium tracking-wider text-surface-100 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] transition group-hover:border-secondary-light/60 group-hover:bg-surface-800">
+        ZS
+      </span>
+      <span class="text-sm font-medium tracking-tight text-surface-100 transition group-hover:text-white">
+        {siteConfig.name}
+      </span>
+    </a>
+
+    <!-- Desktop Nav -->
+    <nav class="hidden md:flex items-center gap-1 rounded-full border border-secondary/20 bg-surface-900/90 p-1 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.03)]">
+      {siteConfig.navLinks.map((item) => {
+        const isActive =
+          item.href === '/'
+            ? pathname === '/'
+            : pathname.startsWith(item.href);
+        return (
+          <a
+            href={item.href}
+            class:list={[
+              'rounded-full px-4 py-1.5 text-xs font-medium transition-all duration-200',
+              isActive
+                ? 'bg-surface-100 text-surface-950 shadow-sm'
+                : 'text-secondary hover:text-surface-100 hover:bg-secondary/10',
+            ]}
+          >
+            {item.label}
+          </a>
+        );
+      })}
+    </nav>
+
+    <!-- Actions -->
+    <div class="hidden sm:flex items-center gap-3">
+      {siteConfig.portfolioDownload.enabled && (
+        <a
+          href={portfolioPdfUrl}
+          download={siteConfig.portfolioDownload.fileName}
+          class="inline-flex items-center gap-1.5 rounded-full border border-secondary/25 bg-surface-850/80 px-3.5 py-1.5 font-mono text-xs text-surface-200 transition hover:border-secondary-light/60 hover:text-white"
+          title="Download Portfolio Lookbook PDF"
+        >
+          <svg class="h-3.5 w-3.5 text-secondary-light" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 16v-8m0 8l-3-3m3 3l3-3M4 20h16" />
+          </svg>
+          <span>Lookbook PDF</span>
+        </a>
+      )}
+    </div>
+
+    <!-- Mobile Menu Toggle -->
+    <button
+      id="mobile-menu-btn"
+      type="button"
+      aria-label="Toggle Menu"
+      class="inline-flex items-center justify-center rounded-lg border border-secondary/25 p-2 text-secondary-light hover:bg-surface-850 hover:text-white md:hidden"
+    >
+      <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+    </button>
+  </div>
+
+  <!-- Mobile Dropdown -->
+  <div id="mobile-menu" class="hidden border-t border-secondary/15 bg-surface-950 px-6 py-4 md:hidden">
+    <div class="flex flex-col gap-2">
+      {siteConfig.navLinks.map((item) => (
+        <a
+          href={item.href}
+          class="rounded-lg px-3 py-2 text-sm font-medium text-surface-200 hover:bg-surface-850 hover:text-white"
+        >
+          {item.label}
+        </a>
+      ))}
+      {siteConfig.portfolioDownload.enabled && (
+        <a
+          href={portfolioPdfUrl}
+          download={siteConfig.portfolioDownload.fileName}
+          class="mt-2 inline-flex items-center justify-center gap-2 rounded-lg border border-secondary/30 bg-surface-850 px-4 py-2.5 font-mono text-xs text-surface-200"
+        >
+          Download Portfolio Lookbook (PDF)
+        </a>
+      )}
+    </div>
+  </div>
+</header>
+
+<script>
+  const btn = document.getElementById('mobile-menu-btn');
+  const menu = document.getElementById('mobile-menu');
+  btn?.addEventListener('click', () => {
+    menu?.classList.toggle('hidden');
+  });
+</script>

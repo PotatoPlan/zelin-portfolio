@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" width="1200" height="900">
+  <defs>
+    <radialGradient id="parcFermeLight" cx="50%" cy="30%" r="60%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.2"/>
+      <stop offset="50%" stop-color="#858990" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#17191c" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="900" fill="#17191c"/>
+  <rect width="1200" height="900" fill="url(#parcFermeLight)"/>
+  
+  <!-- Scale weighing bridge pads -->
+  <rect x="250" y="600" width="220" height="40" rx="4" fill="#1c1f26" stroke="#858990" stroke-opacity="0.4" stroke-width="2"/>
+  <rect x="730" y="600" width="220" height="40" rx="4" fill="#1c1f26" stroke="#858990" stroke-opacity="0.4" stroke-width="2"/>
+  
+  <!-- Cool down tire cooling lines & tape markers -->
+  <line x1="100" y1="640" x2="1100" y2="640" stroke="#f59e0b" stroke-opacity="0.35" stroke-width="2" stroke-dasharray="16 12"/>
+  
+  <!-- Solitary race car cooling in parc ferme -->
+  <path d="M 340 520 C 460 440, 740 440, 860 520 L 920 600 L 280 600 Z" fill="#0c0e12" stroke="#858990" stroke-opacity="0.5" stroke-width="2"/>
+  <circle cx="390" cy="600" r="42" fill="#08090b" stroke="#858990" stroke-width="2"/>
+  <circle cx="810" cy="600" r="42" fill="#08090b" stroke="#858990" stroke-width="2"/>
+  
+  <text x="50" y="840" fill="#858990" font-family="'JetBrains Mono', monospace" font-size="16" letter-spacing="2">PARC FERMÉ · POST-QUALIFYING · 85MM F/1.4</text>
+</svg>

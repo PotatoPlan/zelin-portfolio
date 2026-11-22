@@ -1,0 +1,174 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { siteConfig } from '../data/site';
+import { resolveMediaUrl } from '../lib/media';
+
+const contactEndpoint = import.meta.env.PUBLIC_CONTACT_ENDPOINT || '';
+const web3FormsKey = import.meta.env.PUBLIC_WEB3FORMS_KEY || '';
+const emailSocial = siteConfig.socials.find((s) => s.platform === 'email');
+const fallbackEmail = emailSocial?.handle || 'hello@example.com';
+const portfolioPdfUrl = resolveMediaUrl(siteConfig.portfolioDownload.fileUrl);
+---
+
+<BaseLayout
+  title="Contact"
+  description="Get in touch for photography shoots, creative collaborations, prints, or project inquiries."
+>
+  <section class="mx-auto max-w-6xl px-6 pt-12 pb-16">
+    <div class="mx-auto max-w-3xl">
+      <!-- Intro -->
+      <div>
+        <h1 class="font-display text-4xl text-surface-100 sm:text-5xl">
+          Let’s work together.
+        </h1>
+        <p class="mt-4 text-base leading-relaxed text-surface-200/85">
+          Whether you’re looking to book a shoot, license high-resolution photographs, collaborate on a creative project, or just say hello—reach out below.
+        </p>
+      </div>
+
+      <!-- Interactive Contact Form -->
+      <div class="mt-10">
+        <div class="card-surface p-7 sm:p-10">
+          <h2 class="font-display text-3xl text-stone-100">Send a Message</h2>
+
+          <form
+            id="contact-form"
+            data-endpoint={contactEndpoint}
+            data-web3key={web3FormsKey}
+            data-fallback-email={fallbackEmail}
+            class="mt-6 space-y-5"
+          >
+            <div class="grid gap-5 sm:grid-cols-2">
+              <div>
+                <label for="name" class="block font-mono text-xs uppercase tracking-wider text-stone-300">
+                  Your Name *
+                </label>
+                <input
+                  id="name"
+                  name="name"
+                  type="text"
+                  required
+                  placeholder="Alex Chen"
+                  class="mt-2 w-full rounded-xl border border-stone-800 bg-stone-950/90 px-4 py-3 text-sm text-stone-100 placeholder-stone-500 focus:border-amber-500 focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label for="email" class="block font-mono text-xs uppercase tracking-wider text-stone-300">
+                  Email Address *
+                </label>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  required
+                  placeholder="alex@example.com"
+                  class="mt-2 w-full rounded-xl border border-stone-800 bg-stone-950/90 px-4 py-3 text-sm text-stone-100 placeholder-stone-500 focus:border-amber-500 focus:outline-none"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label for="message" class="block font-mono text-xs uppercase tracking-wider text-stone-300">
+                Message *
+              </label>
+              <textarea
+                id="message"
+                name="message"
+                rows="5"
+                required
+                placeholder="Tell me about your timeline, location, or what you have in mind..."
+                class="mt-2 w-full rounded-xl border border-stone-800 bg-stone-950/90 px-4 py-3 text-sm text-stone-100 placeholder-stone-500 focus:border-amber-500 focus:outline-none"
+              ></textarea>
+            </div>
+
+            <div class="pt-2">
+              <button
+                type="submit"
+                class="inline-flex w-full items-center justify-center gap-2 rounded-full bg-amber-500 px-7 py-3.5 text-sm font-semibold text-stone-950 transition hover:bg-amber-400 sm:w-auto"
+              >
+                <span>Send Inquiry</span>
+                <span aria-hidden="true">&rarr;</span>
+              </button>
+            </div>
+
+            <p id="form-status" class="hidden rounded-xl border px-4 py-3 text-xs"></p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  const form = document.getElementById('contact-form') as HTMLFormElement | null;
+  const statusEl = document.getElementById('form-status');
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!form || !statusEl) return;
+
+    const formData = new FormData(form);
+    const name = String(formData.get('name') || '');
+    const email = String(formData.get('email') || '');
+    const message = String(formData.get('message') || '');
+
+    const endpoint = form.dataset.endpoint || '';
+    const web3Key = form.dataset.web3key || '';
+    const fallbackEmail = form.dataset.fallbackEmail || 'hello@example.com';
+
+    statusEl.className =
+      'block rounded-xl border border-stone-700 bg-stone-900 px-4 py-3 text-xs text-stone-200';
+    statusEl.textContent = 'Sending your message...';
+
+    try {
+      if (web3Key) {
+        const res = await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify({
+            access_key: web3Key,
+            name,
+            email,
+            subject: `[Portfolio] Inquiry from ${name}`,
+            message,
+          }),
+        });
+        if (!res.ok) throw new Error('Submission failed');
+        statusEl.className =
+          'block rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-xs text-emerald-300';
+        statusEl.textContent = 'Thank you! Your message has been sent.';
+        form.reset();
+        return;
+      }
+
+      if (endpoint) {
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify({ name, email, message }),
+        });
+        if (!res.ok) throw new Error('Submission failed');
+        statusEl.className =
+          'block rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-xs text-emerald-300';
+        statusEl.textContent = 'Thank you! Your message has been sent.';
+        form.reset();
+        return;
+      }
+
+      // Graceful mailto fallback when no API key is configured yet
+      const subject = encodeURIComponent(`[Portfolio Inquiry] ${topic} — ${name}`);
+      const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\nTopic: ${topic}\n\n${message}`);
+      window.location.href = `mailto:${fallbackEmail}?subject=${subject}&body=${body}`;
+
+      statusEl.className =
+        'block rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-xs text-amber-200';
+      statusEl.textContent =
+        'Opened your email client with your message pre-filled. (Set PUBLIC_WEB3FORMS_KEY or PUBLIC_CONTACT_ENDPOINT in .env for direct serverless submission.)';
+    } catch {
+      statusEl.className =
+        'block rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-xs text-red-300';
+      statusEl.textContent = `Could not submit automatically. Please email ${fallbackEmail} directly.`;
+    }
+  });
+</script>

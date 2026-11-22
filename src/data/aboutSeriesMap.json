@@ -1,0 +1,178 @@
+{
+  "series": [
+    {
+      "id": "formula-1",
+      "title": "Formula 1",
+      "subtitle": "Grand Prix trackside documentation and race weekend coverage."
+    },
+    {
+      "id": "pcca",
+      "title": "Porsche Carrera Cup Asia",
+      "subtitle": "One-make GT3 cup racing across premier Asian circuits."
+    },
+    {
+      "id": "supercars",
+      "title": "Supercars",
+      "subtitle": "V8 Supercars championship trackside and paddock coverage."
+    },
+    {
+      "id": "macau-gp",
+      "title": "Macau Grand Prix",
+      "subtitle": "Iconic Guia street circuit racing between Armco barriers."
+    },
+    {
+      "id": "akc",
+      "title": "Australian Karting Championship",
+      "subtitle": "National premier sprint karting rounds across Australia."
+    },
+    {
+      "id": "gtwc-asia",
+      "title": "GTWC Asia",
+      "subtitle": "GT World Challenge Asia endurance and sprint GT3 competition."
+    },
+    {
+      "id": "geely-pro",
+      "title": "Geely Pro",
+      "subtitle": "Geely Super Cup Pro one-make touring car championship."
+    },
+    {
+      "id": "tcr-world-tour",
+      "title": "TCR World Tour",
+      "subtitle": "Global touring car battlegrounds across Asia-Pacific."
+    },
+    {
+      "id": "golden-power",
+      "title": "Golden Power Series",
+      "subtitle": "Victorian regional karting championship trackside coverage."
+    },
+    {
+      "id": "speedseries",
+      "title": "SpeedSeries",
+      "subtitle": "Australian national circuit racing festival weekends."
+    },
+    {
+      "id": "motogp",
+      "title": "MotoGP",
+      "subtitle": "Premier class motorcycle road racing across Asia-Pacific."
+    }
+  ],
+  "tracks": [
+    {
+      "id": "lusail",
+      "name": "Lusail",
+      "lat": 25.49,
+      "lon": 51.45,
+      "dx": 0,
+      "dy": 0,
+      "seriesIds": ["formula-1"]
+    },
+    {
+      "id": "marina-bay",
+      "name": "Marina Bay",
+      "lat": 1.29,
+      "lon": 103.86,
+      "dx": 0,
+      "dy": 0,
+      "seriesIds": ["formula-1", "pcca"]
+    },
+    {
+      "id": "beijing-etown",
+      "name": "Beijing E-Town",
+      "lat": 39.79,
+      "lon": 116.51,
+      "dx": 0,
+      "dy": 0,
+      "seriesIds": ["gtwc-asia"]
+    },
+    {
+      "id": "zhaoqing",
+      "name": "Zhaoqing Guangdong International Circuit",
+      "lat": 23.25,
+      "lon": 112.76,
+      "dx": -3,
+      "dy": -2,
+      "seriesIds": ["geely-pro"]
+    },
+    {
+      "id": "guia",
+      "name": "Guia",
+      "lat": 22.2,
+      "lon": 113.55,
+      "dx": 2,
+      "dy": 2,
+      "seriesIds": ["macau-gp", "tcr-world-tour"]
+    },
+    {
+      "id": "the-bend",
+      "name": "The Bend",
+      "lat": -35.29,
+      "lon": 139.46,
+      "dx": 0,
+      "dy": 0,
+      "seriesIds": ["supercars", "tcr-world-tour"]
+    },
+    {
+      "id": "albert-park",
+      "name": "Albert Park",
+      "lat": -37.85,
+      "lon": 144.97,
+      "dx": 0,
+      "dy": 0,
+      "seriesIds": ["formula-1", "supercars"]
+    },
+    {
+      "id": "sandown",
+      "name": "Sandown",
+      "lat": -37.95,
+      "lon": 145.17,
+      "dx": 4,
+      "dy": 1,
+      "seriesIds": ["supercars", "speedseries"]
+    },
+    {
+      "id": "phillip-island",
+      "name": "Phillip Island",
+      "lat": -38.5,
+      "lon": 145.23,
+      "dx": 2,
+      "dy": 6,
+      "seriesIds": ["speedseries", "motogp"]
+    },
+    {
+      "id": "oakleigh",
+      "name": "Oakleigh Karting Club",
+      "lat": -37.93,
+      "lon": 145.1,
+      "dx": 3,
+      "dy": 2,
+      "seriesIds": ["akc"]
+    },
+    {
+      "id": "gkcv",
+      "name": "GKCV",
+      "lat": -37.83,
+      "lon": 144.91,
+      "dx": -4,
+      "dy": -2,
+      "seriesIds": ["akc"]
+    },
+    {
+      "id": "gippsland",
+      "name": "Gippsland",
+      "lat": -38.23,
+      "lon": 146.42,
+      "dx": 5,
+      "dy": 2,
+      "seriesIds": ["golden-power"]
+    },
+    {
+      "id": "eastern-lion",
+      "name": "Eastern Lion",
+      "lat": -37.02,
+      "lon": 145.05,
+      "dx": -1,
+      "dy": -4,
+      "seriesIds": ["golden-power"]
+    }
+  ]
+}

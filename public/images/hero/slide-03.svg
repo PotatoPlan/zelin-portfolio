@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" width="1600" height="1000">
+  <defs>
+    <radialGradient id="redLights" cx="75%" cy="25%" r="50%">
+      <stop offset="0%" stop-color="#ef4444" stop-opacity="0.28"/>
+      <stop offset="60%" stop-color="#991b1b" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#17191c" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="gridTrack" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#14161a"/>
+      <stop offset="100%" stop-color="#1e2229"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="1000" fill="#17191c"/>
+  <rect width="1600" height="1000" fill="url(#gridTrack)"/>
+  <rect width="1600" height="1000" fill="url(#redLights)"/>
+  
+  <!-- Starting lights gantry -->
+  <rect x="750" y="160" width="550" height="75" rx="8" fill="#111317" stroke="#858990" stroke-opacity="0.3" stroke-width="2"/>
+  <!-- 5 red start lights -->
+  <circle cx="820" cy="197" r="18" fill="#ef4444" filter="drop-shadow(0 0 12px #ef4444)"/>
+  <circle cx="915" cy="197" r="18" fill="#ef4444" filter="drop-shadow(0 0 12px #ef4444)"/>
+  <circle cx="1010" cy="197" r="18" fill="#ef4444" filter="drop-shadow(0 0 12px #ef4444)"/>
+  <circle cx="1105" cy="197" r="18" fill="#ef4444" filter="drop-shadow(0 0 12px #ef4444)"/>
+  <circle cx="1200" cy="197" r="18" fill="#ef4444" filter="drop-shadow(0 0 12px #ef4444)"/>
+  
+  <!-- Grid slot markers -->
+  <path d="M 500 700 L 780 700 L 750 720 L 470 720 Z" fill="#ffffff" fill-opacity="0.4"/>
+  <path d="M 920 620 L 1180 620 L 1150 640 L 890 640 Z" fill="#ffffff" fill-opacity="0.3"/>
+  <path d="M 1250 560 L 1480 560 L 1450 578 L 1220 578 Z" fill="#ffffff" fill-opacity="0.2"/>
+  
+  <!-- Single-seater formula car rear wing and diffuser silhouette -->
+  <path d="M 980 520 L 1220 520 L 1240 540 L 960 540 Z" fill="#ef4444" fill-opacity="0.8"/>
+  <rect x="940" y="540" width="320" height="85" rx="12" fill="#0b0c0e" stroke="#858990" stroke-opacity="0.4" stroke-width="2"/>
+  <!-- Rain light blinking on car -->
+  <rect x="1085" y="580" width="30" height="16" rx="4" fill="#ef4444" filter="drop-shadow(0 0 10px #ef4444)"/>
+  
+  <!-- Subtle Metadata overlay -->
+  <text x="110" y="930" fill="#858990" font-family="'JetBrains Mono', monospace" font-size="18" letter-spacing="3">03 // GRID FORMATION · 85MM F/1.8 · 1/500S</text>
+</svg>

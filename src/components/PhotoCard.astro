@@ -1,0 +1,49 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import SmartImage from './SmartImage.astro';
+import { resolveMediaUrl } from '../lib/media';
+
+interface Props {
+  entry: CollectionEntry<'photos'>;
+  featuredLayout?: boolean;
+}
+
+const { entry, featuredLayout = false } = Astro.props;
+const { title, category, coverImage, coverFocusX = 50, coverFocusY = 50, coverZoom = 1 } = entry.data;
+---
+
+<article
+  data-category={category}
+  class:list={[
+    'photo-series-card group relative overflow-hidden rounded-2xl border border-secondary/20 bg-surface-900 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.04)] transition-all duration-300 hover:border-secondary/50 hover:shadow-2xl hover:shadow-black/70 cursor-pointer',
+    'min-h-[160px] sm:aspect-[11/2] w-full',
+    featuredLayout ? 'w-full' : '',
+  ]}
+>
+  <!-- Full-bleed Cover Photo Background covering entire card -->
+  <div class="absolute inset-0 z-0 overflow-hidden">
+    <div
+      class="h-full w-full"
+      style={`transform: scale(${coverZoom}); transform-origin: ${coverFocusX}% ${coverFocusY}%;`}
+    >
+      <SmartImage
+        src={coverImage}
+        alt={title}
+        style={`object-position: ${coverFocusX}% ${coverFocusY}%;`}
+        class="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+      />
+    </div>
+    <!-- Subtle top-left gradient to ensure text contrast while photo stays visible -->
+    <div class="absolute inset-0 bg-gradient-to-br from-surface-950/85 via-surface-950/35 to-transparent transition-opacity duration-300 group-hover:opacity-75"></div>
+  </div>
+
+  <!-- Full-card clickable link -->
+  <a href={`/gallery/${entry.slug}`} class="absolute inset-0 z-20" aria-label={`View ${title}`}></a>
+
+  <!-- Title placed at top-left with padding to the border -->
+  <div class="relative z-10 flex h-full flex-col justify-start p-6 sm:p-7 md:p-8 pointer-events-none">
+    <h3 class="font-display text-2xl sm:text-3xl font-medium tracking-tight text-surface-100 transition-all duration-300 group-hover:text-white group-hover:translate-x-1">
+      {title}
+    </h3>
+  </div>
+</article>

@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" width="1600" height="1000">
+  <defs>
+    <radialGradient id="titaniumGlow" cx="72%" cy="45%" r="55%">
+      <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.22"/>
+      <stop offset="35%" stop-color="#8b5cf6" stop-opacity="0.12"/>
+      <stop offset="70%" stop-color="#f59e0b" stop-opacity="0.06"/>
+      <stop offset="100%" stop-color="#17191c" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="garageFloor" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#121316"/>
+      <stop offset="100%" stop-color="#1a1c22"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="1000" fill="#17191c"/>
+  <rect width="1600" height="1000" fill="url(#garageFloor)"/>
+  <rect width="1600" height="1000" fill="url(#titaniumGlow)"/>
+  
+  <!-- Garage gantry & monitor array -->
+  <rect x="900" y="240" width="180" height="110" rx="6" fill="#0d0e12" stroke="#858990" stroke-opacity="0.35" stroke-width="2"/>
+  <line x1="920" y1="280" x2="1060" y2="280" stroke="#06b6d4" stroke-opacity="0.7" stroke-width="2"/>
+  <path d="M 920 310 Q 980 290 1020 320 T 1060 295" fill="none" stroke="#22c55e" stroke-opacity="0.8" stroke-width="2"/>
+  
+  <rect x="1110" y="240" width="180" height="110" rx="6" fill="#0d0e12" stroke="#858990" stroke-opacity="0.35" stroke-width="2"/>
+  <line x1="1130" y1="275" x2="1270" y2="275" stroke="#f59e0b" stroke-opacity="0.6" stroke-width="2"/>
+  <line x1="1130" y1="305" x2="1240" y2="305" stroke="#ef4444" stroke-opacity="0.6" stroke-width="2"/>
+  
+  <!-- Exhaust manifold titanium heat coloration -->
+  <path d="M 750 640 C 900 580, 1050 560, 1280 620" fill="none" stroke="#3b82f6" stroke-width="14" stroke-linecap="round"/>
+  <path d="M 820 625 C 940 575, 1070 560, 1260 610" fill="none" stroke="#8b5cf6" stroke-width="12" stroke-linecap="round"/>
+  <path d="M 900 605 C 990 570, 1090 562, 1240 600" fill="none" stroke="#f59e0b" stroke-width="8" stroke-linecap="round"/>
+  
+  <!-- Paddock tire stack silhouette -->
+  <ellipse cx="650" cy="740" rx="90" ry="24" fill="#090a0d" stroke="#858990" stroke-opacity="0.3" stroke-width="2"/>
+  <ellipse cx="650" cy="700" rx="90" ry="24" fill="#0b0c10" stroke="#858990" stroke-opacity="0.3" stroke-width="2"/>
+  <ellipse cx="650" cy="660" rx="90" ry="24" fill="#0e0f13" stroke="#858990" stroke-opacity="0.3" stroke-width="2"/>
+  
+  <!-- Subtle Metadata overlay -->
+  <text x="110" y="930" fill="#858990" font-family="'JetBrains Mono', monospace" font-size="18" letter-spacing="3">05 // PADDOCK GARAGE CRAFT · 50MM F/1.4 · 1/200S</text>
+</svg>

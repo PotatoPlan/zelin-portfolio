@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 100" fill="none" class="w-full h-auto max-w-[200px]">
+  <defs>
+    <linearGradient id="pdkr-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#eceef0" />
+      <stop offset="60%" stop-color="#d4d7dd" />
+      <stop offset="100%" stop-color="#858990" />
+    </linearGradient>
+    <linearGradient id="pdkr-accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#eceef0" />
+      <stop offset="100%" stop-color="#595d64" />
+    </linearGradient>
+  </defs>
+
+  <!-- Viewfinder & Speed Emblem -->
+  <g transform="translate(100, 4) scale(0.9)">
+    <!-- Top-left bracket -->
+    <path d="M 0 10 L 0 2 L 8 2" stroke="#858990" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+    <!-- Top-right bracket -->
+    <path d="M 36 2 L 44 2 L 44 10" stroke="#858990" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+    <!-- Bottom-left bracket -->
+    <path d="M 0 34 L 0 42 L 8 42" stroke="#858990" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+    <!-- Bottom-right bracket -->
+    <path d="M 36 42 L 44 42 L 44 34" stroke="#858990" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+
+    <!-- Center dynamic racing shutter / apex icon -->
+    <circle cx="22" cy="22" r="14" stroke="url(#pdkr-grad)" stroke-width="2.5" stroke-dasharray="20 4 8 4" />
+    <!-- Inner focal apex mark -->
+    <circle cx="22" cy="22" r="4.5" fill="url(#pdkr-grad)" />
+    <!-- Speed line accent -->
+    <path d="M 6 22 L 14 22" stroke="#858990" stroke-width="1.5" stroke-linecap="round" />
+    <path d="M 30 22 L 38 22" stroke="#858990" stroke-width="1.5" stroke-linecap="round" />
+  </g>
+
+  <!-- Wordmark -->
+  <text
+    x="120"
+    y="68"
+    text-anchor="middle"
+    fill="#eceef0"
+    font-family="system-ui, -apple-system, sans-serif"
+    font-size="17"
+    font-weight="700"
+    letter-spacing="5"
+  >
+    PADDOCKER
+  </text>
+
+  <!-- Subtitle -->
+  <text
+    x="120"
+    y="86"
+    text-anchor="middle"
+    fill="#858990"
+    font-family="monospace"
+    font-size="8.5"
+    font-weight="500"
+    letter-spacing="3.5"
+  >
+    MOTORSPORT AGENCY
+  </text>
+</svg>

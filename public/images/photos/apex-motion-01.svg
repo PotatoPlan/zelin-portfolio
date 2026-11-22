@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" width="1600" height="1000">
+  <defs>
+    <linearGradient id="trackBg" x1="0" y1="0" x2="1" y2="0.4">
+      <stop offset="0%" stop-color="#0c0a09"/>
+      <stop offset="50%" stop-color="#1c1917"/>
+      <stop offset="100%" stop-color="#291509"/>
+    </linearGradient>
+    <linearGradient id="streak" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#ef4444" stop-opacity="0"/>
+      <stop offset="45%" stop-color="#f97316" stop-opacity="0.65"/>
+      <stop offset="85%" stop-color="#fef08a" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="1000" fill="url(#trackBg)"/>
+  <g transform="skewX(-24)">
+    <rect x="-200" y="420" width="2200" height="18" fill="url(#streak)"/>
+    <rect x="-100" y="460" width="2000" height="8" fill="url(#streak)" opacity="0.6"/>
+    <rect x="100" y="520" width="1900" height="36" fill="url(#streak)" opacity="0.85"/>
+    <rect x="-300" y="640" width="2400" height="90" fill="#f59e0b" fill-opacity="0.07"/>
+  </g>
+  <path d="M 480 540 C 620 450, 920 450, 1090 540 L 1160 590 L 430 590 Z" fill="#18181b" stroke="#f59e0b" stroke-opacity="0.5" stroke-width="2"/>
+  <circle cx="600" cy="590" r="54" fill="#09090b" stroke="#fbbf24" stroke-width="4"/>
+  <circle cx="990" cy="590" r="54" fill="#09090b" stroke="#fbbf24" stroke-width="4"/>
+  <text x="80" y="910" fill="#f5f5f4" fill-opacity="0.7" font-family="monospace" font-size="22" letter-spacing="4">SERIES 02 // APEX AT DUSK · 70-200MM PANNING @ 1/40S</text>
+</svg>

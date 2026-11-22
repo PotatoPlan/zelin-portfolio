@@ -1,0 +1,32 @@
+{
+  "homeHero": {
+    "heading": "Motorsport Images at Paddocker",
+    "bio": "Motorsport photography trackside and in the paddock.",
+    "ctaLabel": "Download Portfolio PDF"
+  },
+  "homeAgency": {
+    "eyebrow": "Agency Profile",
+    "heading": "Capturing velocity, engineering, and trackside atmosphere.",
+    "paragraph1": "Paddocker is a dedicated motorsport visual agency specializing in high-speed trackside documentation, paddock storytelling, and commercial campaigns for racing teams, constructors, and automotive brands.",
+    "paragraph2": "From the high-pressure tension of the pit wall to the quiet precision inside the garage, we operate across international circuits to translate kinetic speed and engineering into iconic visual narratives."
+  },
+  "portfolioHeader": {
+    "heading": "Past Trackside Experiences"
+  },
+  "aboutIntro": {
+    "eyebrow": "About",
+    "name": "Shu Zelin",
+    "role": "Photographer · Visual Storyteller · Creative Technologist",
+    "location": "Melbourne, Australia",
+    "nextEventLabel": "Next Event",
+    "nextEventName": "Australian Grand Prix",
+    "nextEventLocation": "Melbourne, Australia",
+    "nextEventDate": "March 2027",
+    "availability": "Available for select shoots & collaborations",
+    "shortBio": "Motorsport photography trackside and in the paddock.",
+    "fullBio": [
+      "What started as carrying a compact camera on late-night walks evolved into a dedicated pursuit of light, pace, and narrative structure.",
+      "Whether tracking high-speed machinery trackside, waiting for a solitary silhouette in an urban canyon, or building digital products by day, my focus remains the same: intentional framing and honest detail."
+    ]
+  }
+}

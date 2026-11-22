@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" width="1600" height="1000">
+  <defs>
+    <linearGradient id="pitLaneGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f1114"/>
+      <stop offset="100%" stop-color="#1b1d22"/>
+    </linearGradient>
+    <radialGradient id="cyanNeon" cx="70%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.22"/>
+      <stop offset="50%" stop-color="#0284c7" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#17191c" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="rainReflection" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.35"/>
+      <stop offset="50%" stop-color="#f59e0b" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#0f1114" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="1000" fill="#17191c"/>
+  <rect width="1600" height="1000" fill="url(#pitLaneGrad)"/>
+  <rect width="1600" height="1000" fill="url(#cyanNeon)"/>
+  
+  <!-- Pit gantry structure & lines -->
+  <line x1="200" y1="120" x2="1600" y2="120" stroke="#858990" stroke-opacity="0.25" stroke-width="2"/>
+  <line x1="850" y1="120" x2="850" y2="520" stroke="#858990" stroke-opacity="0.2" stroke-width="2"/>
+  <line x1="1350" y1="120" x2="1350" y2="520" stroke="#858990" stroke-opacity="0.2" stroke-width="2"/>
+  
+  <!-- Pit speed limit line -->
+  <line x1="0" y1="620" x2="1600" y2="620" stroke="#06b6d4" stroke-opacity="0.4" stroke-width="4" stroke-dasharray="24 16"/>
+  
+  <!-- Wet puddle glossy reflection -->
+  <ellipse cx="1100" cy="740" rx="380" ry="70" fill="url(#rainReflection)"/>
+  <ellipse cx="650" cy="800" rx="280" ry="50" fill="url(#rainReflection)" opacity="0.6"/>
+  
+  <!-- GT car silhouette in pit stall -->
+  <path d="M 880 540 C 980 460, 1220 465, 1380 540 L 1440 600 L 820 600 Z" fill="#0c0d10" stroke="#06b6d4" stroke-opacity="0.4" stroke-width="1.8"/>
+  <circle cx="980" cy="600" r="44" fill="#08080a" stroke="#858990" stroke-opacity="0.6" stroke-width="2.5"/>
+  <circle cx="1320" cy="600" r="44" fill="#08080a" stroke="#858990" stroke-opacity="0.6" stroke-width="2.5"/>
+  
+  <!-- Subtle Metadata overlay -->
+  <text x="110" y="930" fill="#858990" font-family="'JetBrains Mono', monospace" font-size="18" letter-spacing="3">02 // PIT LANE NOCTURNE · 35MM F/1.4 · 1/160S</text>
+</svg>

@@ -1,0 +1,166 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import CircuitMap from '../components/CircuitMap.astro';
+import { siteConfig } from '../data/site';
+import { resolveMediaUrl } from '../lib/media';
+import aboutProfileData from '../data/aboutProfile.json';
+import pageCopy from '../data/pageCopy.json';
+
+const aboutPhotoSrc = resolveMediaUrl(aboutProfileData.src);
+const aboutFocusX = typeof aboutProfileData.focusX === 'number' ? aboutProfileData.focusX : 50;
+const aboutFocusY = typeof aboutProfileData.focusY === 'number' ? aboutProfileData.focusY : 50;
+const aboutZoom = typeof aboutProfileData.zoom === 'number' ? aboutProfileData.zoom : 1;
+
+const experiences = (await getCollection('experiences')).sort(
+  (a, b) => a.data.order - b.data.order
+);
+
+const seriesList = (await getCollection('photos'))
+  .sort((a, b) => a.data.order - b.data.order)
+  .map((s) => ({
+    slug: s.slug,
+    title: s.data.title,
+    subtitle: s.data.subtitle,
+  }));
+---
+
+<BaseLayout
+  title="About"
+  description="Introduction, past experience, and motorsport series covered by Shu Zelin."
+>
+  <div class="mx-auto max-w-6xl px-4 sm:px-6 pt-12 pb-20 space-y-20">
+    <!-- Section 1: Introduction of Myself -->
+    <section aria-labelledby="about-intro-heading">
+      <div class="grid gap-10 lg:grid-cols-12 lg:items-start">
+        <div class="lg:col-span-7 space-y-5">
+          <div>
+            <p id="about-eyebrow" class="font-mono text-xs uppercase tracking-[0.22em] text-secondary">{pageCopy.aboutIntro.eyebrow}</p>
+            <h1 id="about-intro-heading" class="mt-2 font-display text-4xl font-medium tracking-tight text-surface-100 sm:text-5xl">
+              {pageCopy.aboutIntro.name}
+            </h1>
+          </div>
+
+          <div id="about-bio-container" class="space-y-4 text-base leading-relaxed text-surface-200/85">
+            <p>{pageCopy.aboutIntro.shortBio}</p>
+            {pageCopy.aboutIntro.fullBio.map((paragraph) => (
+              <p>{paragraph}</p>
+            ))}
+          </div>
+
+          <!-- Next Event & Location Component -->
+          <div class="pt-2">
+            <div class="inline-flex flex-wrap items-center gap-x-4 gap-y-2 rounded-2xl border border-secondary/25 bg-surface-900/80 px-4 py-3 text-xs shadow-[inset_0_1px_0_0_rgba(255,255,255,0.04)]">
+              <div class="flex items-center gap-2">
+                <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
+                <span id="about-next-event-label" class="font-mono text-[11px] uppercase tracking-wider text-secondary">
+                  {pageCopy.aboutIntro.nextEventLabel || 'Next Event'}
+                </span>
+              </div>
+              <span class="hidden sm:inline text-secondary/40">|</span>
+              <span id="about-next-event-name" class="font-medium text-surface-100">
+                {pageCopy.aboutIntro.nextEventName || 'Trackside Assignment'}
+              </span>
+              <span class="text-secondary/50">&middot;</span>
+              <span id="about-next-event-location" class="text-secondary-light">
+                {pageCopy.aboutIntro.nextEventLocation || pageCopy.aboutIntro.location}
+              </span>
+              {pageCopy.aboutIntro.nextEventDate && (
+                <>
+                  <span class="text-secondary/50">&middot;</span>
+                  <span id="about-next-event-date" class="font-mono text-[11px] text-secondary">
+                    {pageCopy.aboutIntro.nextEventDate}
+                  </span>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <!-- Portrait Photo (Vertical 4:3 -> aspect-[3/4], managed in Darkroom) -->
+        <div class="lg:col-span-5">
+          <div class="mx-auto w-full max-w-sm lg:ml-auto lg:mr-0 overflow-hidden rounded-2xl border border-secondary/25 bg-surface-900/60 shadow-2xl shadow-black/50">
+            <div class="relative w-full aspect-[3/4] overflow-hidden">
+              <img
+                id="about-profile-img"
+                src={aboutPhotoSrc}
+                alt={aboutProfileData.alt || siteConfig.name}
+                style={`object-position: ${aboutFocusX}% ${aboutFocusY}%; transform: scale(${aboutZoom}); transform-origin: ${aboutFocusX}% ${aboutFocusY}%;`}
+                class="h-full w-full object-cover"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: Interactive Circuit Map (Middle East to New Zealand) -->
+    <section aria-labelledby="series-worked-heading" class="border-t border-secondary/15 pt-14">
+      <div class="mb-6">
+        <h2 id="series-worked-heading" class="font-display text-3xl font-medium tracking-tight text-surface-100 sm:text-4xl">
+          Series I’ve Worked With
+        </h2>
+      </div>
+
+      <CircuitMap seriesList={seriesList} />
+    </section>
+  </div>
+
+  <script is:inline>
+    (function applyAboutDraftPreview() {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('preview') !== 'draft') return;
+
+        const raw = localStorage.getItem('darkroom_preview_about-photo');
+        if (raw) {
+          const draft = JSON.parse(raw);
+          const frame = draft && Array.isArray(draft.frames) ? draft.frames[0] : null;
+          const img = document.getElementById('about-profile-img');
+          if (img && frame) {
+            const fx = typeof frame.focusX === 'number' ? frame.focusX : 50;
+            const fy = typeof frame.focusY === 'number' ? frame.focusY : 50;
+            const zoom = typeof frame.zoom === 'number' ? frame.zoom : 1;
+            img.src = frame.src;
+            img.alt = frame.alt || 'Shu Zelin';
+            img.style.objectPosition = `${fx}% ${fy}%`;
+            img.style.transform = `scale(${zoom})`;
+            img.style.transformOrigin = `${fx}% ${fy}%`;
+          }
+
+          if (draft && draft.copy) {
+            const eb = document.getElementById('about-eyebrow');
+            const nameEl = document.getElementById('about-intro-heading');
+            const evLabelEl = document.getElementById('about-next-event-label');
+            const evNameEl = document.getElementById('about-next-event-name');
+            const evLocEl = document.getElementById('about-next-event-location');
+            const evDateEl = document.getElementById('about-next-event-date');
+            const bioEl = document.getElementById('about-bio-container');
+            if (eb && draft.copy.eyebrow !== undefined) eb.textContent = draft.copy.eyebrow;
+            if (nameEl && draft.copy.name !== undefined) nameEl.textContent = draft.copy.name;
+            if (evLabelEl && draft.copy.nextEventLabel !== undefined) evLabelEl.textContent = draft.copy.nextEventLabel;
+            if (evNameEl && draft.copy.nextEventName !== undefined) evNameEl.textContent = draft.copy.nextEventName;
+            if (evLocEl && draft.copy.nextEventLocation !== undefined) evLocEl.textContent = draft.copy.nextEventLocation;
+            if (evDateEl && draft.copy.nextEventDate !== undefined) evDateEl.textContent = draft.copy.nextEventDate;
+            if (bioEl && (draft.copy.shortBio !== undefined || Array.isArray(draft.copy.fullBio))) {
+              const paras = [draft.copy.shortBio || '', ...(draft.copy.fullBio || [])].filter(Boolean);
+              bioEl.innerHTML = '';
+              paras.forEach((pText) => {
+                const p = document.createElement('p');
+                p.textContent = pText;
+                bioEl.appendChild(p);
+              });
+            }
+          }
+        }
+
+        const banner = document.createElement('div');
+        banner.className =
+          'fixed bottom-5 left-5 z-50 flex items-center gap-3 rounded-full border border-amber-400/40 bg-surface-950/95 px-4 py-2 text-xs font-medium text-amber-300 shadow-2xl backdrop-blur-md';
+        banner.innerHTML =
+          '<span class="h-2 w-2 rounded-full bg-amber-400"></span><span>Draft Preview — Unsaved Darkroom Changes</span>';
+        document.body.appendChild(banner);
+      } catch (_) {}
+    })();
+  </script>
+</BaseLayout>

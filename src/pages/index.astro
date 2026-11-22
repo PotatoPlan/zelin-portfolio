@@ -1,0 +1,198 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PhotoCard from '../components/PhotoCard.astro';
+import Lightbox from '../components/Lightbox.astro';
+import HeroCarousel from '../components/HeroCarousel.astro';
+import { siteConfig } from '../data/site';
+import { resolveMediaUrl } from '../lib/media';
+
+import homeGalleryData from '../data/homeGallery.json';
+import pageCopy from '../data/pageCopy.json';
+
+const allPhotos = (await getCollection('photos')).sort(
+  (a, b) => a.data.order - b.data.order
+);
+const featuredPhotos = allPhotos.filter((p) => p.data.featured);
+const displayPhotos = featuredPhotos.length > 0 ? featuredPhotos : allPhotos.slice(0, 3);
+
+const experiences = (await getCollection('experiences'))
+  .sort((a, b) => a.data.order - b.data.order)
+  .slice(0, 3);
+
+const portfolioPdfUrl = resolveMediaUrl(siteConfig.portfolioDownload.fileUrl);
+
+const galleryGridPhotos = homeGalleryData;
+---
+
+<BaseLayout>
+  <!-- Hero Section with Left-to-Right Carousel Fade -->
+  <section class="relative overflow-hidden min-h-[460px] sm:aspect-[5/2] flex flex-col justify-start border-b border-secondary/10">
+    <HeroCarousel />
+
+    <div class="relative z-10 mx-auto max-w-6xl w-full px-4 sm:px-6 pt-14 sm:pt-20 pb-16">
+      <div class="w-full lg:max-w-[44%] drop-shadow-[0_2px_10px_rgba(0,0,0,0.65)]">
+        <h1 id="home-hero-heading" class="font-display text-[clamp(0.95rem,3vw,2.25rem)] font-medium leading-none tracking-tight text-white whitespace-nowrap">
+          {pageCopy.homeHero.heading}
+        </h1>
+
+        <p id="home-hero-bio" class="mt-6 max-w-md text-base leading-relaxed text-white/90 sm:text-lg">
+          {pageCopy.homeHero.bio}
+        </p>
+
+        <!-- Hero Actions -->
+        {siteConfig.portfolioDownload.enabled && (
+          <div class="mt-9 flex flex-wrap items-center gap-3.5">
+            <a
+              href={portfolioPdfUrl}
+              download={siteConfig.portfolioDownload.fileName}
+              class="inline-flex items-center gap-2.5 rounded-full bg-surface-100 px-6 py-3 text-sm font-semibold text-surface-950 shadow-lg shadow-black/25 transition hover:bg-secondary-light"
+            >
+              <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 16v-8m0 8l-3-3m3 3l3-3M4 20h16" />
+              </svg>
+              <span id="home-hero-cta">{pageCopy.homeHero.ctaLabel}</span>
+            </a>
+          </div>
+        )}
+      </div>
+    </div>
+  </section>
+
+  <!-- Gallery Grid Section (3 columns, 4 rows = 12 items, sharp unrounded corners) -->
+  <section class="mx-auto max-w-6xl px-4 sm:px-6 py-7 sm:py-9">
+    <div>
+      <h2 class="font-display text-3xl text-surface-100 sm:text-4xl">
+        Gallery
+      </h2>
+    </div>
+
+    <!-- Gallery Grid: 3 columns, sharp unrounded corners, pure photo presentation -->
+    <div id="home-gallery-grid" class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+      {galleryGridPhotos.slice(0, 12).map((item) => (
+        <div
+          data-lightbox-src={item.src}
+          data-lightbox-title={item.title}
+          data-lightbox-caption={item.location}
+          data-lightbox-meta={item.meta}
+          class="group relative aspect-[4/3] cursor-pointer overflow-hidden rounded-none border border-secondary/20 bg-surface-900/60 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.03)] transition-all duration-300 hover:border-secondary/60 hover:shadow-2xl hover:shadow-black/70"
+        >
+          <img
+            src={item.src}
+            alt={item.title}
+            class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+            loading="lazy"
+          />
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- Agency Overview -->
+  <section class="mx-auto max-w-6xl px-4 sm:px-6 py-7 sm:py-9">
+    <div class="card-surface p-8 sm:p-10 lg:p-12">
+      <div class="grid gap-8 lg:grid-cols-12 lg:items-center">
+        <!-- Left: Logo Section (centred, not too big) -->
+        <div class="lg:col-span-5 flex flex-col items-center justify-center p-4 sm:p-6 text-center">
+          <div class="flex items-center justify-center w-full max-w-[220px]">
+            <img
+              src="/images/logo-agency.svg"
+              alt="Paddocker Agency Logo"
+              class="w-full h-auto max-h-24 object-contain"
+              loading="lazy"
+            />
+          </div>
+        </div>
+
+        <!-- Right: Agency Introduction -->
+        <div class="lg:col-span-7 space-y-4 text-sm sm:text-base leading-relaxed text-surface-200/85">
+          <div>
+            <p id="home-agency-eyebrow" class="font-mono text-xs uppercase tracking-[0.22em] text-secondary">{pageCopy.homeAgency.eyebrow}</p>
+            <h2 id="home-agency-heading" class="mt-2 font-display text-2xl sm:text-3xl text-surface-100">
+              {pageCopy.homeAgency.heading}
+            </h2>
+          </div>
+          <p id="home-agency-p1">
+            {pageCopy.homeAgency.paragraph1}
+          </p>
+          <p id="home-agency-p2">
+            {pageCopy.homeAgency.paragraph2}
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <Lightbox />
+
+  <script is:inline>
+    (function applyHomeDraftPreview() {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('preview') !== 'draft') return;
+
+        // Hydrate Home Hero text copy draft if present
+        const rawHero = localStorage.getItem('darkroom_preview_home-hero');
+        if (rawHero) {
+          const heroDraft = JSON.parse(rawHero);
+          if (heroDraft && heroDraft.copy) {
+            const h1 = document.getElementById('home-hero-heading');
+            const bio = document.getElementById('home-hero-bio');
+            const cta = document.getElementById('home-hero-cta');
+            if (h1 && heroDraft.copy.heading !== undefined) h1.textContent = heroDraft.copy.heading;
+            if (bio && heroDraft.copy.bio !== undefined) bio.textContent = heroDraft.copy.bio;
+            if (cta && heroDraft.copy.ctaLabel !== undefined) cta.textContent = heroDraft.copy.ctaLabel;
+          }
+        }
+
+        // Hydrate Home Agency text copy draft if present
+        const rawAgency = localStorage.getItem('darkroom_preview_home-agency');
+        if (rawAgency) {
+          const agencyDraft = JSON.parse(rawAgency);
+          if (agencyDraft && agencyDraft.copy) {
+            const eb = document.getElementById('home-agency-eyebrow');
+            const hd = document.getElementById('home-agency-heading');
+            const p1 = document.getElementById('home-agency-p1');
+            const p2 = document.getElementById('home-agency-p2');
+            if (eb && agencyDraft.copy.eyebrow !== undefined) eb.textContent = agencyDraft.copy.eyebrow;
+            if (hd && agencyDraft.copy.heading !== undefined) hd.textContent = agencyDraft.copy.heading;
+            if (p1 && agencyDraft.copy.paragraph1 !== undefined) p1.textContent = agencyDraft.copy.paragraph1;
+            if (p2 && agencyDraft.copy.paragraph2 !== undefined) p2.textContent = agencyDraft.copy.paragraph2;
+          }
+        }
+
+        // Hydrate Home Gallery draft if present
+        const rawGallery = localStorage.getItem('darkroom_preview_home-gallery');
+        if (rawGallery) {
+          const draft = JSON.parse(rawGallery);
+          const grid = document.getElementById('home-gallery-grid');
+          if (grid && draft && Array.isArray(draft.frames)) {
+            grid.innerHTML = '';
+            draft.frames.slice(0, 12).forEach((item) => {
+              const card = document.createElement('div');
+              card.setAttribute('data-lightbox-src', item.src);
+              card.setAttribute('data-lightbox-title', item.alt || item.title || 'Gallery Frame');
+              card.className =
+                'group relative aspect-[4/3] cursor-pointer overflow-hidden rounded-none border border-secondary/20 bg-surface-900/60 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.03)] transition-all duration-300 hover:border-secondary/60 hover:shadow-2xl hover:shadow-black/70';
+
+              const img = document.createElement('img');
+              img.src = item.src;
+              img.alt = item.alt || item.title || 'Gallery Frame';
+              img.className = 'h-full w-full object-cover transition-transform duration-500 group-hover:scale-105';
+              card.appendChild(img);
+              grid.appendChild(card);
+            });
+          }
+        }
+
+        // Show non-intrusive Draft Preview banner
+        const banner = document.createElement('div');
+        banner.className =
+          'fixed bottom-5 left-5 z-50 flex items-center gap-3 rounded-full border border-amber-400/40 bg-surface-950/95 px-4 py-2 text-xs font-medium text-amber-300 shadow-2xl backdrop-blur-md';
+        banner.innerHTML =
+          '<span class="h-2 w-2 rounded-full bg-amber-400"></span><span>Draft Preview — Unsaved Darkroom Changes</span>';
+        document.body.appendChild(banner);
+      } catch (_) {}
+    })();
+  </script>
+</BaseLayout>

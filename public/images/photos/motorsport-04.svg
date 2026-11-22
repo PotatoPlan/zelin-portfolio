@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" width="1200" height="900">
+  <defs>
+    <radialGradient id="macauGlow" cx="65%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.25"/>
+      <stop offset="45%" stop-color="#0284c7" stop-opacity="0.1"/>
+      <stop offset="100%" stop-color="#17191c" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="900" fill="#17191c"/>
+  <rect width="1200" height="900" fill="url(#macauGlow)"/>
+  
+  <!-- Macau Armco barriers and yellow/black painted guardrails -->
+  <path d="M 0 350 L 1200 480" stroke="#fbbf24" stroke-width="20" stroke-dasharray="40 40"/>
+  <path d="M 0 350 L 1200 480" stroke="#000000" stroke-width="20" stroke-dasharray="40 40" stroke-dashoffset="40"/>
+  
+  <path d="M 0 750 L 1200 680" stroke="#fbbf24" stroke-width="24" stroke-dasharray="50 50"/>
+  <path d="M 0 750 L 1200 680" stroke="#000000" stroke-width="24" stroke-dasharray="50 50" stroke-dashoffset="50"/>
+  
+  <!-- Narrow track asphalt -->
+  <polygon points="0,370 1200,500 1200,670 0,740" fill="#14171d"/>
+  
+  <!-- F3 / GT3 single seater clipping the apex wall -->
+  <path d="M 520 540 C 620 480, 840 490, 950 550 L 980 580 L 480 580 Z" fill="#0b0d10" stroke="#38bdf8" stroke-width="2" stroke-opacity="0.6"/>
+  <circle cx="580" cy="580" r="32" fill="#070709" stroke="#858990" stroke-width="2.5"/>
+  <circle cx="900" cy="580" r="32" fill="#070709" stroke="#858990" stroke-width="2.5"/>
+  
+  <text x="50" y="840" fill="#858990" font-family="'JetBrains Mono', monospace" font-size="16" letter-spacing="2">MACAU GUIA CIRCUIT · MELCO APEX · 1/200S</text>
+</svg>

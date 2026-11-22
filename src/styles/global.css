@@ -1,0 +1,60 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    background-color: #17191c;
+    color: #eceef0;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  ::selection {
+    background-color: rgba(133, 137, 144, 0.32);
+    color: #f5f6f7;
+  }
+}
+
+@layer utilities {
+  .bg-radial-glow {
+    background-image:
+      radial-gradient(
+        ellipse 80% 55% at 50% -10%,
+        rgba(133, 137, 144, 0.14) 0%,
+        rgba(133, 137, 144, 0.04) 45%,
+        transparent 75%
+      );
+  }
+
+  .card-surface {
+    @apply rounded-2xl border border-secondary/20 bg-surface-850/75 backdrop-blur-md shadow-[inset_0_1px_0_0_rgba(255,255,255,0.04)] transition-all duration-300;
+  }
+
+  .card-surface-hover {
+    @apply hover:border-secondary/45 hover:bg-surface-850 hover:shadow-2xl hover:shadow-black/50;
+  }
+
+  .dark-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(133, 137, 144, 0.28) transparent;
+  }
+
+  .dark-scrollbar::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+
+  .dark-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .dark-scrollbar::-webkit-scrollbar-thumb {
+    background-color: rgba(133, 137, 144, 0.28);
+    border-radius: 9999px;
+  }
+
+  .dark-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(180, 184, 191, 0.5);
+  }
+}

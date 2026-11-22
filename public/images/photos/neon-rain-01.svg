@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1066" width="1600" height="1066">
+  <defs>
+    <linearGradient id="bg1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#090d16"/>
+      <stop offset="50%" stop-color="#111827"/>
+      <stop offset="100%" stop-color="#1f1224"/>
+    </linearGradient>
+    <radialGradient id="glow1" cx="0.72" cy="0.38" r="0.35">
+      <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.55"/>
+      <stop offset="60%" stop-color="#ea580c" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glow2" cx="0.28" cy="0.68" r="0.4">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.38"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1600" height="1066" fill="url(#bg1)"/>
+  <rect width="1600" height="1066" fill="url(#glow1)"/>
+  <rect width="1600" height="1066" fill="url(#glow2)"/>
+  <g stroke="#ffffff" stroke-opacity="0.06" stroke-width="1">
+    <line x1="0" y1="720" x2="1600" y2="720"/>
+    <line x1="533" y1="0" x2="533" y2="1066"/>
+    <line x1="1066" y1="0" x2="1066" y2="1066"/>
+  </g>
+  <rect x="180" y="160" width="260" height="560" fill="#0b0f19" stroke="#38bdf8" stroke-opacity="0.25"/>
+  <rect x="1080" y="90" width="320" height="630" fill="#0b0f19" stroke="#f59e0b" stroke-opacity="0.3"/>
+  <circle cx="1150" cy="410" r="95" fill="#f59e0b" fill-opacity="0.18"/>
+  <circle cx="440" cy="680" r="140" fill="#38bdf8" fill-opacity="0.12"/>
+  <path d="M 0 720 L 680 720 L 320 1066 L 0 1066 Z" fill="#f59e0b" fill-opacity="0.08"/>
+  <path d="M 820 720 L 1600 720 L 1600 1066 L 1120 1066 Z" fill="#38bdf8" fill-opacity="0.09"/>
+  <text x="80" y="960" fill="#f5f5f4" fill-opacity="0.7" font-family="monospace" font-size="22" letter-spacing="4">SERIES 01 // AFTER HOURS IN SHINJUKU · 35MM F/1.4</text>
+</svg>

@@ -1,0 +1,146 @@
+[
+  {
+    "title": "Apex at Dusk",
+    "location": "Phillip Island, VIC",
+    "meta": "70-200mm f/2.8 · 1/40s · ISO 100",
+    "src": "/images/hero/slide-01.svg",
+    "category": "Motorsport",
+    "alt": "Apex at Dusk",
+    "aspect": "landscape"
+  },
+  {
+    "title": "Pit Lane Nocturne",
+    "location": "Albert Park, VIC",
+    "meta": "35mm f/1.4 · 1/160s · ISO 800",
+    "src": "/images/hero/slide-02.svg",
+    "category": "Paddock",
+    "alt": "Pit Lane Nocturne",
+    "aspect": "portrait"
+  },
+  {
+    "title": "Grid Formation",
+    "location": "Albert Park, VIC",
+    "meta": "85mm f/1.8 · 1/500s · ISO 200",
+    "src": "/images/hero/slide-03.svg",
+    "category": "Motorsport",
+    "alt": "Grid Formation",
+    "aspect": "landscape"
+  },
+  {
+    "title": "Chicane Dynamics",
+    "location": "Mount Panorama, Bathurst",
+    "meta": "135mm f/2.0 · 1/250s · ISO 100",
+    "src": "/images/hero/slide-04.svg",
+    "category": "Motorsport",
+    "alt": "Chicane Dynamics",
+    "aspect": "portrait"
+  },
+  {
+    "title": "Garage Telemetry",
+    "location": "The Bend, SA",
+    "meta": "50mm f/1.4 · 1/200s · ISO 400",
+    "src": "/images/hero/slide-05.svg",
+    "category": "Paddock",
+    "alt": "Garage Telemetry",
+    "aspect": "landscape"
+  },
+  {
+    "title": "Turn 4 Sunset Panning",
+    "location": "Phillip Island, VIC",
+    "meta": "135mm · f/8 · 1/40s · ISO 100",
+    "src": "/images/photos/apex-motion-01.svg",
+    "category": "Motorsport",
+    "alt": "Turn 4 Sunset Panning",
+    "aspect": "landscape"
+  },
+  {
+    "title": "Kerb Geometry & Brake Glow",
+    "location": "Albert Park, VIC",
+    "meta": "200mm · f/2.8 · 1/500s · ISO 400",
+    "src": "/images/photos/apex-motion-02.svg",
+    "category": "Motorsport",
+    "alt": "Kerb Geometry & Brake Glow",
+    "aspect": "portrait"
+  },
+  {
+    "title": "Conrod Straight Descent",
+    "location": "Mount Panorama, Bathurst",
+    "meta": "100-400mm · f/4.5 · 1/50s · ISO 100",
+    "src": "/images/photos/motorsport-03.svg",
+    "category": "Motorsport",
+    "alt": "Conrod Straight Descent",
+    "aspect": "landscape"
+  },
+  {
+    "title": "Melco Hairpin Apex",
+    "location": "Macau Guia Circuit",
+    "meta": "24-70mm · f/2.8 · 1/200s · ISO 640",
+    "src": "/images/photos/motorsport-04.svg",
+    "category": "Motorsport",
+    "alt": "Melco Hairpin Apex",
+    "aspect": "portrait"
+  },
+  {
+    "title": "Parc Fermé Solitude",
+    "location": "Albert Park, VIC",
+    "meta": "85mm · f/1.4 · 1/125s · ISO 320",
+    "src": "/images/photos/motorsport-05.svg",
+    "category": "Paddock",
+    "alt": "Parc Fermé Solitude",
+    "aspect": "landscape"
+  },
+  {
+    "title": "Centerlock Wheel Change",
+    "location": "Sydney Motorsport Park",
+    "meta": "35mm · f/1.4 · 1/800s · ISO 1250",
+    "src": "/images/photos/motorsport-06.svg",
+    "category": "Paddock",
+    "alt": "Centerlock Wheel Change",
+    "aspect": "landscape"
+  },
+  {
+    "title": "Aerodynamic Wake & Vortex",
+    "location": "Phillip Island, VIC",
+    "meta": "70-200mm · f/2.8 · 1/640s · ISO 200",
+    "src": "/images/photos/motorsport-07.svg",
+    "category": "Motorsport",
+    "alt": "Aerodynamic Wake & Vortex",
+    "aspect": "portrait"
+  },
+  {
+    "title": "After Hours Shinjuku",
+    "location": "Tokyo, Japan",
+    "meta": "35mm · f/1.4 · 1/60s · ISO 1600",
+    "src": "/images/photos/neon-rain-01.svg",
+    "category": "Street",
+    "alt": "After Hours Shinjuku",
+    "aspect": "landscape"
+  },
+  {
+    "title": "Kabukicho Mist Reflections",
+    "location": "Tokyo, Japan",
+    "meta": "50mm · f/1.2 · 1/125s · ISO 800",
+    "src": "/images/photos/neon-rain-02.svg",
+    "category": "Street",
+    "alt": "Kabukicho Mist Reflections",
+    "aspect": "portrait"
+  },
+  {
+    "title": "Monolith & Concrete Shadow",
+    "location": "Melbourne, VIC",
+    "meta": "50mm · f/1.8 · 1/250s · ISO 100",
+    "src": "/images/photos/brutalist-light-01.svg",
+    "category": "Architecture",
+    "alt": "Monolith & Concrete Shadow",
+    "aspect": "portrait"
+  },
+  {
+    "title": "Great Ocean Southern Swell",
+    "location": "Great Ocean Road, VIC",
+    "meta": "24mm · f/8 · 30s · ISO 64",
+    "src": "/images/photos/southern-coast-01.svg",
+    "category": "Landscape",
+    "alt": "Great Ocean Southern Swell",
+    "aspect": "landscape"
+  }
+]

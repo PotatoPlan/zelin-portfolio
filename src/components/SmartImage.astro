@@ -1,0 +1,37 @@
+---
+import { resolveMediaUrl, getResponsiveSrcSet } from '../lib/media';
+
+interface Props {
+  src: string;
+  alt: string;
+  class?: string;
+  style?: string;
+  loading?: 'lazy' | 'eager';
+  widths?: number[];
+  sizes?: string;
+}
+
+const {
+  src,
+  alt,
+  class: className = '',
+  style,
+  loading = 'lazy',
+  widths = [640, 1024, 1600],
+  sizes = '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw',
+} = Astro.props;
+
+const resolvedSrc = resolveMediaUrl(src, { width: 1600, quality: 85 });
+const srcSet = getResponsiveSrcSet(src, widths);
+---
+
+<img
+  src={resolvedSrc}
+  srcset={srcSet}
+  sizes={srcSet ? sizes : undefined}
+  alt={alt}
+  style={style}
+  loading={loading}
+  decoding="async"
+  class:list={['block object-cover transition-transform duration-700 ease-out', className]}
+/>

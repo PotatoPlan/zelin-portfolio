@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1066" width="1600" height="1066">
+  <defs>
+    <linearGradient id="concrete" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1c1917"/>
+      <stop offset="100%" stop-color="#0c0a09"/>
+    </linearGradient>
+    <linearGradient id="sunbeam" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fafaf9" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#fafaf9" stop-opacity="0.02"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="1066" fill="url(#concrete)"/>
+  <polygon points="260,0 980,0 1420,1066 640,1066" fill="url(#sunbeam)"/>
+  <polygon points="0,0 520,0 520,1066 0,1066" fill="#090807" fill-opacity="0.7"/>
+  <g stroke="#e7e5e4" stroke-opacity="0.18" stroke-width="2">
+    <line x1="520" y1="0" x2="520" y2="1066"/>
+    <line x1="520" y1="340" x2="1600" y2="340"/>
+    <line x1="520" y1="680" x2="1600" y2="680"/>
+    <line x1="980" y1="0" x2="980" y2="1066"/>
+  </g>
+  <text x="80" y="960" fill="#f5f5f4" fill-opacity="0.7" font-family="monospace" font-size="22" letter-spacing="4">SERIES 03 // MONOLITH &amp; SHADOW · ARCHITECTURAL STUDY</text>
+</svg>

@@ -1,0 +1,59 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PhotoCard from '../../components/PhotoCard.astro';
+import Lightbox from '../../components/Lightbox.astro';
+import pageCopy from '../../data/pageCopy.json';
+
+const allSeries = (await getCollection('photos')).sort(
+  (a, b) => a.data.order - b.data.order
+);
+---
+
+<BaseLayout
+  title="Portfolio"
+  description="Curated photography series, visual stories, and individual frames with camera notes."
+>
+  <section class="mx-auto max-w-6xl px-6 pt-12 pb-16">
+    <!-- Header -->
+    <div class="max-w-3xl">
+      <h1 id="portfolio-page-heading" class="font-display text-4xl text-surface-100 sm:text-5xl">
+        {pageCopy.portfolioHeader.heading}
+      </h1>
+    </div>
+
+    <!-- Series List View (1 card per row) -->
+    <div id="series-grid" class="mt-10 flex flex-col gap-5">
+      {allSeries.map((entry) => (
+        <PhotoCard entry={entry} />
+      ))}
+    </div>
+  </section>
+
+  <Lightbox />
+
+  <script is:inline>
+    (function applyPortfolioDraftPreview() {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('preview') !== 'draft') return;
+
+        const raw = localStorage.getItem('darkroom_preview_portfolio-page');
+        if (raw) {
+          const draft = JSON.parse(raw);
+          const h1 = document.getElementById('portfolio-page-heading');
+          if (h1 && draft && draft.copy && draft.copy.heading !== undefined) {
+            h1.textContent = draft.copy.heading;
+          }
+        }
+
+        const banner = document.createElement('div');
+        banner.className =
+          'fixed bottom-5 left-5 z-50 flex items-center gap-3 rounded-full border border-amber-400/40 bg-surface-950/95 px-4 py-2 text-xs font-medium text-amber-300 shadow-2xl backdrop-blur-md';
+        banner.innerHTML =
+          '<span class="h-2 w-2 rounded-full bg-amber-400"></span><span>Draft Preview — Unsaved Darkroom Changes</span>';
+        document.body.appendChild(banner);
+      } catch (_) {}
+    })();
+  </script>
+</BaseLayout>

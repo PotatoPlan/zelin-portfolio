@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" width="1200" height="900">
+  <defs>
+    <radialGradient id="airgunFlash" cx="45%" cy="55%" r="45%">
+      <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.3"/>
+      <stop offset="50%" stop-color="#ea580c" stop-opacity="0.1"/>
+      <stop offset="100%" stop-color="#17191c" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="900" fill="#17191c"/>
+  <rect width="1200" height="900" fill="url(#airgunFlash)"/>
+  
+  <!-- Pneumatic air hose coiled lines -->
+  <path d="M 150 150 Q 280 400 480 520 T 750 560" fill="none" stroke="#06b6d4" stroke-opacity="0.5" stroke-width="4"/>
+  <path d="M 980 150 Q 860 380 680 500 T 520 540" fill="none" stroke="#f59e0b" stroke-opacity="0.4" stroke-width="3"/>
+  
+  <!-- Wheel nut centerlock spinning sparks -->
+  <circle cx="560" cy="540" r="65" fill="#0c0d10" stroke="#f59e0b" stroke-width="4"/>
+  <circle cx="560" cy="540" r="22" fill="#ef4444"/>
+  <line x1="560" y1="460" x2="560" y2="620" stroke="#fbbf24" stroke-width="2"/>
+  <line x1="480" y1="540" x2="640" y2="540" stroke="#fbbf24" stroke-width="2"/>
+  
+  <text x="50" y="840" fill="#858990" font-family="'JetBrains Mono', monospace" font-size="16" letter-spacing="2">PIT BOX 2.1S CENTERLOCK REACTION · 1/800S</text>
+</svg>

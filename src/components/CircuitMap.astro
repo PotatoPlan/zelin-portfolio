@@ -1,0 +1,331 @@
+---
+import { geoEquirectangular, geoPath } from 'd3-geo';
+import { feature } from 'topojson-client';
+import land50m from 'world-atlas/land-50m.json';
+import aboutSeriesMapData from '../data/aboutSeriesMap.json';
+
+interface Props {
+  seriesList?: unknown[];
+}
+
+// Real Natural Earth 1:50m landmass geometry (coastlines only — no borders or labels)
+// Cropped to Middle East (30°E) -> New Zealand (180°E), 50°N -> 50°S
+const projection = geoEquirectangular()
+  .center([105, 0])
+  .scale(1000 / ((150 * Math.PI) / 180))
+  .translate([500, 280]);
+
+const pathGenerator = geoPath(projection);
+const landGeo = feature(land50m as any, (land50m as any).objects.land);
+const landSvgPath = pathGenerator(landGeo as any) || '';
+
+const curatedSeries = aboutSeriesMapData.series;
+const circuitPins = aboutSeriesMapData.tracks;
+
+const projectedPins = circuitPins.map((pin) => {
+  const coords = projection([pin.lon, pin.lat]) || [0, 0];
+  return {
+    ...pin,
+    x: Number((coords[0] + (pin.dx || 0)).toFixed(1)),
+    y: Number((coords[1] + (pin.dy || 0)).toFixed(1)),
+  };
+});
+
+const getCircuitCount = (id: string) =>
+  circuitPins.filter((p) => p.seriesIds.includes(id)).length;
+
+const defaultSeries = curatedSeries[0] || { id: '', title: '', subtitle: '' };
+---
+
+<div id="circuit-map-root" class="grid gap-5 lg:grid-cols-12 lg:items-stretch">
+  <!-- Left Parallel Panel: Fixed height matching right column (map + detail), scrollable if needed -->
+  <div class="lg:col-span-4 lg:relative">
+    <div id="map-series-list" class="dark-scrollbar flex flex-col gap-1.5 lg:absolute lg:inset-0 lg:overflow-y-auto lg:pr-2">
+      {curatedSeries.map((s, idx) => {
+        const count = getCircuitCount(s.id);
+        return (
+          <button
+            type="button"
+            data-series-id={s.id}
+            class:list={[
+              'map-series-btn group w-full shrink-0 rounded-xl border px-3.5 py-2 text-left transition-all duration-200',
+              idx === 0
+                ? 'border-surface-100/70 bg-surface-850/90 shadow-sm'
+                : 'border-secondary/20 bg-surface-900/50 hover:border-secondary/50 hover:bg-surface-900',
+            ]}
+          >
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-[13px] font-medium text-surface-100 transition group-hover:text-white truncate">{s.title}</span>
+              <span class="font-mono text-[10px] text-secondary shrink-0">{count} {count === 1 ? 'circuit' : 'circuits'}</span>
+            </div>
+            <p class="mt-0.5 text-[11px] text-secondary/80 line-clamp-1">
+              {s.subtitle}
+            </p>
+          </button>
+        );
+      })}
+    </div>
+  </div>
+
+  <!-- Right Panel: Interactive World Map + Selected Series Detail Card -->
+  <div class="lg:col-span-8 space-y-4">
+    <!-- Map Canvas (Real Natural Earth Coastlines, Zero Borders or Labels) -->
+    <div class="relative overflow-hidden rounded-2xl border border-secondary/25 bg-[#121417] shadow-2xl shadow-black/60">
+      <svg
+        viewBox="0 0 1000 560"
+        class="block h-auto w-full select-none"
+        role="img"
+        aria-label="Interactive motorsport circuit map"
+      >
+        <defs>
+          <radialGradient id="map-ocean-glow" cx="55%" cy="55%" r="65%">
+            <stop offset="0%" stop-color="#1e2228" stop-opacity="0.7" />
+            <stop offset="100%" stop-color="#121417" stop-opacity="1" />
+          </radialGradient>
+        </defs>
+
+        <!-- Ocean Backdrop -->
+        <rect width="1000" height="560" fill="url(#map-ocean-glow)" />
+
+        <!-- Subtle Graticule Grid -->
+        <g stroke="#858990" stroke-opacity="0.08" stroke-width="0.75" stroke-dasharray="3 4">
+          <line x1="0" y1="280" x2="1000" y2="280" />
+          <line x1="0" y1="140" x2="1000" y2="140" />
+          <line x1="0" y1="420" x2="1000" y2="420" />
+          <line x1="200" y1="0" x2="200" y2="560" />
+          <line x1="400" y1="0" x2="400" y2="560" />
+          <line x1="600" y1="0" x2="600" y2="560" />
+          <line x1="800" y1="0" x2="800" y2="560" />
+        </g>
+
+        <!-- Real World Coastlines (Landmass only, zero country borders) -->
+        <path
+          d={landSvgPath}
+          fill="#22262c"
+          stroke="#474c54"
+          stroke-width="0.9"
+          stroke-linejoin="round"
+        />
+
+        <!-- Circuit Pins with Radio Pulse Effect (non-clickable) -->
+        <g id="map-pins-layer" class="pointer-events-none">
+          {projectedPins.map((pin) => (
+            <g
+              transform={`translate(${pin.x}, ${pin.y})`}
+              data-pin-id={pin.id}
+              data-pin-series={pin.seriesIds.join(',')}
+              class="map-pin transition-opacity duration-200"
+            >
+              <circle r="6" fill="none" stroke="#34d399" stroke-width="1.4" class="pin-radio" />
+              <circle r="10" fill="#eceef0" fill-opacity="0.12" class="pin-halo" />
+              <circle r="4.2" fill="#eceef0" stroke="#121417" stroke-width="1.5" class="pin-core" />
+            </g>
+          ))}
+        </g>
+      </svg>
+    </div>
+
+    <!-- Selected Series Info Card (Title & Short Description only) -->
+    <div id="map-series-detail" class="card-surface p-5">
+      <div class="space-y-1">
+        <h3 id="detail-series-title" class="font-display text-xl sm:text-2xl font-medium text-surface-100">
+          {defaultSeries.title}
+        </h3>
+        <p id="detail-series-desc" class="text-sm text-surface-200/80">
+          {defaultSeries.subtitle}
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  @keyframes mapRadioPulse {
+    0% {
+      transform: scale(0.8);
+      opacity: 0.75;
+    }
+    70% {
+      transform: scale(2.8);
+      opacity: 0;
+    }
+    100% {
+      transform: scale(2.8);
+      opacity: 0;
+    }
+  }
+
+  .pin-radio-active {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: mapRadioPulse 2.2s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  }
+</style>
+
+<script is:inline define:vars={{ initialSeries: curatedSeries }}>
+  (function initCircuitMap() {
+    const root = document.getElementById('circuit-map-root');
+    if (!root) return;
+
+    let activeSeriesList = initialSeries;
+
+    // Hydrate from Darkroom draft preview if ?preview=draft is active
+    try {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('preview') === 'draft') {
+        const raw = localStorage.getItem('darkroom_preview_about-photo');
+        if (raw) {
+          const draft = JSON.parse(raw);
+          if (draft && draft.aboutMap && Array.isArray(draft.aboutMap.series) && Array.isArray(draft.aboutMap.tracks)) {
+            activeSeriesList = draft.aboutMap.series;
+            const tracks = draft.aboutMap.tracks;
+
+            // Rebuild left series list
+            const listEl = document.getElementById('map-series-list');
+            if (listEl) {
+              listEl.innerHTML = '';
+              activeSeriesList.forEach((s, idx) => {
+                const count = tracks.filter((t) => Array.isArray(t.seriesIds) && t.seriesIds.includes(s.id)).length;
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.dataset.seriesId = s.id;
+                btn.className = `map-series-btn group w-full shrink-0 rounded-xl border px-3.5 py-2 text-left transition-all duration-200 ${
+                  idx === 0
+                    ? 'border-surface-100/70 bg-surface-850/90 shadow-sm'
+                    : 'border-secondary/20 bg-surface-900/50 hover:border-secondary/50 hover:bg-surface-900'
+                }`;
+                btn.innerHTML = `
+                  <div class="flex items-center justify-between gap-2">
+                    <span class="text-[13px] font-medium text-surface-100 transition group-hover:text-white truncate"></span>
+                    <span class="font-mono text-[10px] text-secondary shrink-0">${count} ${count === 1 ? 'circuit' : 'circuits'}</span>
+                  </div>
+                  <p class="mt-0.5 text-[11px] text-secondary/80 line-clamp-1"></p>
+                `;
+                btn.querySelector('span').textContent = s.title;
+                btn.querySelector('p').textContent = s.subtitle;
+                listEl.appendChild(btn);
+              });
+            }
+
+            // Rebuild SVG pins using exact equirectangular projection (30°E..180°E, 50°N..50°S)
+            const pinsLayer = document.getElementById('map-pins-layer');
+            if (pinsLayer) {
+              const ns = 'http://www.w3.org/2000/svg';
+              pinsLayer.innerHTML = '';
+              tracks.forEach((t) => {
+                const lon = Number(t.lon) || 0;
+                const lat = Number(t.lat) || 0;
+                const dx = Number(t.dx) || 0;
+                const dy = Number(t.dy) || 0;
+                const x = Number((((lon - 30) * (1000 / 150)) + dx).toFixed(1));
+                const y = Number((((50 - lat) * 5.6) + dy).toFixed(1));
+
+                const g = document.createElementNS(ns, 'g');
+                g.setAttribute('transform', `translate(${x}, ${y})`);
+                g.setAttribute('data-pin-id', t.id || '');
+                g.setAttribute('data-pin-series', Array.isArray(t.seriesIds) ? t.seriesIds.join(',') : '');
+                g.setAttribute('class', 'map-pin transition-opacity duration-200');
+
+                const radio = document.createElementNS(ns, 'circle');
+                radio.setAttribute('r', '6');
+                radio.setAttribute('fill', 'none');
+                radio.setAttribute('stroke', '#34d399');
+                radio.setAttribute('stroke-width', '1.4');
+                radio.setAttribute('class', 'pin-radio');
+
+                const halo = document.createElementNS(ns, 'circle');
+                halo.setAttribute('r', '10');
+                halo.setAttribute('fill', '#eceef0');
+                halo.setAttribute('fill-opacity', '0.12');
+                halo.setAttribute('class', 'pin-halo');
+
+                const core = document.createElementNS(ns, 'circle');
+                core.setAttribute('r', '4.2');
+                core.setAttribute('fill', '#eceef0');
+                core.setAttribute('stroke', '#121417');
+                core.setAttribute('stroke-width', '1.5');
+                core.setAttribute('class', 'pin-core');
+
+                g.appendChild(radio);
+                g.appendChild(halo);
+                g.appendChild(core);
+                pinsLayer.appendChild(g);
+              });
+            }
+          }
+        }
+      }
+    } catch (_) {}
+
+    const buttons = root.querySelectorAll('.map-series-btn');
+    const pins = root.querySelectorAll('.map-pin');
+    const detailTitle = document.getElementById('detail-series-title');
+    const detailDesc = document.getElementById('detail-series-desc');
+
+    let activeId = activeSeriesList[0]?.id || '';
+
+    function selectSeries(seriesId) {
+      activeId = seriesId;
+
+      buttons.forEach((btn) => {
+        const isMatch = btn.dataset.seriesId === seriesId;
+        if (isMatch) {
+          btn.classList.remove('border-secondary/20', 'bg-surface-900/50', 'hover:border-secondary/50', 'hover:bg-surface-900');
+          btn.classList.add('border-surface-100/70', 'bg-surface-850/90', 'shadow-sm');
+        } else {
+          btn.classList.remove('border-surface-100/70', 'bg-surface-850/90', 'shadow-sm');
+          btn.classList.add('border-secondary/20', 'bg-surface-900/50', 'hover:border-secondary/50', 'hover:bg-surface-900');
+        }
+      });
+
+      pins.forEach((pinEl) => {
+        const ids = (pinEl.dataset.pinSeries || '').split(',');
+        const matches = ids.includes(seriesId);
+        const core = pinEl.querySelector('.pin-core');
+        const halo = pinEl.querySelector('.pin-halo');
+        const radio = pinEl.querySelector('.pin-radio');
+        if (matches) {
+          pinEl.style.opacity = '1';
+          if (core) {
+            core.setAttribute('r', '5.5');
+            core.setAttribute('fill', '#34d399');
+          }
+          if (halo) {
+            halo.setAttribute('r', '14');
+            halo.setAttribute('fill', '#34d399');
+            halo.setAttribute('fill-opacity', '0.22');
+          }
+          if (radio) {
+            radio.style.display = 'block';
+            radio.classList.add('pin-radio-active');
+          }
+        } else {
+          pinEl.style.opacity = '0.22';
+          if (core) {
+            core.setAttribute('r', '3.2');
+            core.setAttribute('fill', '#858990');
+          }
+          if (halo) halo.setAttribute('fill-opacity', '0');
+          if (radio) {
+            radio.style.display = 'none';
+            radio.classList.remove('pin-radio-active');
+          }
+        }
+      });
+
+      const seriesObj = activeSeriesList.find((s) => s.id === seriesId);
+      if (seriesObj) {
+        detailTitle.textContent = seriesObj.title;
+        detailDesc.textContent = seriesObj.subtitle;
+      }
+    }
+
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        if (btn.dataset.seriesId) selectSeries(btn.dataset.seriesId);
+      });
+    });
+
+    if (activeId) selectSeries(activeId);
+  })();
+</script>

@@ -1,0 +1,101 @@
+---
+/**
+ * Client-side Lightbox Modal
+ * Triggered by any element with `[data-lightbox-src]`.
+ */
+---
+
+<div
+  id="photo-lightbox"
+  role="dialog"
+  aria-modal="true"
+  aria-hidden="true"
+  class="fixed inset-0 z-50 hidden items-center justify-center bg-surface-950/95 p-4 backdrop-blur-xl sm:p-8"
+>
+  <button
+    id="lightbox-close"
+    type="button"
+    aria-label="Close lightbox"
+    class="absolute right-5 top-5 z-10 inline-flex items-center gap-1.5 rounded-full border border-secondary/30 bg-surface-850/90 px-3.5 py-1.5 font-mono text-xs text-surface-200 transition hover:border-secondary-light hover:text-white"
+  >
+    <span>ESC</span>
+    <span>&times;</span>
+  </button>
+
+  <div class="flex max-h-full max-w-5xl flex-col items-center">
+    <div class="relative overflow-hidden rounded-xl border border-secondary/25 bg-surface-900 shadow-2xl">
+      <img
+        id="lightbox-img"
+        src=""
+        alt=""
+        class="max-h-[75vh] w-auto object-contain"
+      />
+    </div>
+
+    <div class="mt-4 text-center">
+      <h4 id="lightbox-title" class="font-display text-2xl text-surface-100"></h4>
+      <p id="lightbox-caption" class="mt-1 max-w-2xl text-sm text-surface-200/80"></p>
+      <p id="lightbox-meta" class="mt-1.5 font-mono text-xs text-secondary"></p>
+    </div>
+  </div>
+</div>
+
+<script>
+  function setupLightbox() {
+    const modal = document.getElementById('photo-lightbox');
+    const closeBtn = document.getElementById('lightbox-close');
+    const img = document.getElementById('lightbox-img') as HTMLImageElement | null;
+    const titleEl = document.getElementById('lightbox-title');
+    const captionEl = document.getElementById('lightbox-caption');
+    const metaEl = document.getElementById('lightbox-meta');
+
+    if (!modal || !img) return;
+
+    function openLightbox(src: string, title: string, caption: string, meta: string) {
+      if (!modal || !img) return;
+      img.src = src;
+      img.alt = title;
+      if (titleEl) titleEl.textContent = title;
+      if (captionEl) captionEl.textContent = caption;
+      if (metaEl) metaEl.textContent = meta;
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+      if (!modal || !img) return;
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      modal.setAttribute('aria-hidden', 'true');
+      img.src = '';
+      document.body.style.overflow = '';
+    }
+
+    document.querySelectorAll<HTMLElement>('[data-lightbox-src]').forEach((trigger) => {
+      trigger.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const src = trigger.dataset.lightboxSrc || '';
+        const title = trigger.dataset.lightboxTitle || '';
+        const caption = trigger.dataset.lightboxCaption || '';
+        const meta = trigger.dataset.lightboxMeta || '';
+        openLightbox(src, title, caption, meta);
+      });
+    });
+
+    closeBtn?.addEventListener('click', closeLightbox);
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeLightbox();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+        closeLightbox();
+      }
+    });
+  }
+
+  setupLightbox();
+</script>

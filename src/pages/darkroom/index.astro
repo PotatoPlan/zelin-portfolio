@@ -1,0 +1,1943 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { resolveMediaUrl } from '../../lib/media';
+import homeHeroData from '../../data/homeHero.json';
+import homeGalleryData from '../../data/homeGallery.json';
+import aboutProfileData from '../../data/aboutProfile.json';
+import pageCopy from '../../data/pageCopy.json';
+import aboutSeriesMap from '../../data/aboutSeriesMap.json';
+
+const allSeries = (await getCollection('photos')).sort(
+  (a, b) => a.data.order - b.data.order
+);
+
+const allExperiences = (await getCollection('experiences'))
+  .sort((a, b) => a.data.order - b.data.order)
+  .map((exp) => ({
+    slug: exp.slug,
+    role: exp.data.role,
+    organization: exp.data.organization,
+    type: exp.data.type,
+    period: exp.data.period,
+    location: exp.data.location,
+    current: exp.data.current,
+    summary: exp.data.summary,
+    highlights: exp.data.highlights || [],
+  }));
+
+// Default motorsport frames pool used for fillers when a series has fewer frames
+const defaultPool = [
+  { src: '/images/photos/apex-motion-01.svg', alt: 'Turn 4 sunset panning', aspect: 'landscape' },
+  { src: '/images/photos/apex-motion-02.svg', alt: 'Kerb geometry and brake glow', aspect: 'portrait' },
+  { src: '/images/photos/motorsport-03.svg', alt: 'Conrod straight high-speed descent', aspect: 'landscape' },
+  { src: '/images/hero/slide-01.svg', alt: 'Apex entry trajectory', aspect: 'landscape' },
+  { src: '/images/photos/motorsport-04.svg', alt: 'Chicane dynamic balance', aspect: 'portrait' },
+  { src: '/images/photos/motorsport-05.svg', alt: 'Parc fermé evening solitude', aspect: 'landscape' },
+  { src: '/images/hero/slide-02.svg', alt: 'Pit lane nocturnal reflections', aspect: 'portrait' },
+  { src: '/images/photos/motorsport-06.svg', alt: 'Centerlock wheel change', aspect: 'landscape' },
+  { src: '/images/hero/slide-03.svg', alt: 'Grid formation under morning mist', aspect: 'landscape' },
+  { src: '/images/photos/motorsport-07.svg', alt: 'Aerodynamic wake and vortex trail', aspect: 'portrait' },
+  { src: '/images/hero/slide-04.svg', alt: 'Sprint pack into hairpin', aspect: 'landscape' },
+  { src: '/images/hero/slide-05.svg', alt: 'Telemetry analysis in garage', aspect: 'portrait' },
+  { src: '/images/photos/apex-motion-01.svg', alt: 'Late apex brake glow', aspect: 'landscape' },
+  { src: '/images/photos/motorsport-03.svg', alt: 'Full throttle acceleration zone', aspect: 'portrait' },
+  { src: '/images/photos/motorsport-04.svg', alt: 'Suspension compression over kerb', aspect: 'landscape' },
+  { src: '/images/photos/apex-motion-02.svg', alt: 'Headlight beams in spray', aspect: 'landscape' },
+  { src: '/images/hero/slide-01.svg', alt: 'Twilight race restart', aspect: 'portrait' },
+  { src: '/images/photos/motorsport-05.svg', alt: 'Pit wall timing boards', aspect: 'landscape' },
+  { src: '/images/hero/slide-02.svg', alt: 'Mechanic wheel change reflex', aspect: 'portrait' },
+  { src: '/images/photos/motorsport-06.svg', alt: 'Tire temperature heat cycle', aspect: 'landscape' },
+  { src: '/images/hero/slide-03.svg', alt: 'Podium champagne spray', aspect: 'landscape' },
+  { src: '/images/photos/motorsport-07.svg', alt: 'Rear diffuser carbon weave', aspect: 'portrait' },
+  { src: '/images/hero/slide-04.svg', alt: 'Overtake on the inside line', aspect: 'landscape' },
+  { src: '/images/hero/slide-05.svg', alt: 'Cockpit telemetry monitor', aspect: 'portrait' },
+  { src: '/images/photos/apex-motion-01.svg', alt: 'Golden hour panning streak', aspect: 'landscape' },
+  { src: '/images/photos/motorsport-03.svg', alt: 'Downshift flame from exhaust', aspect: 'landscape' },
+  { src: '/images/photos/motorsport-04.svg', alt: 'Front splitter aero deflection', aspect: 'portrait' },
+  { src: '/images/photos/motorsport-05.svg', alt: 'Race director flag signals', aspect: 'landscape' },
+  { src: '/images/hero/slide-01.svg', alt: 'Cool down lap wave to fans', aspect: 'portrait' },
+  { src: '/images/photos/apex-motion-02.svg', alt: 'Post-race tire marbles on tarmac', aspect: 'landscape' },
+];
+
+const gallerySeriesData = allSeries.map((s) => {
+  const existingGallery = (s.data.gallery || []).map((g) => ({
+    src: resolveMediaUrl(g.src),
+    alt: g.alt || g.caption || s.data.title,
+    aspect: g.aspect === 'portrait' ? 'portrait' : 'landscape',
+  }));
+
+  const fillerNeeded = Math.max(0, 30 - existingGallery.length);
+  const fullGallery = [
+    ...existingGallery,
+    ...defaultPool.slice(0, fillerNeeded),
+  ];
+
+  return {
+    slug: s.slug,
+    title: s.data.title,
+    group: 'Gallery Pages',
+    liveUrl: `/gallery/${s.slug}`,
+    coverImage: resolveMediaUrl(s.data.coverImage),
+    seriesMeta: {
+      title: s.data.title,
+      subtitle: s.data.subtitle,
+    },
+    cover: {
+      src: resolveMediaUrl(s.data.coverImage),
+      focusX: typeof s.data.coverFocusX === 'number' ? s.data.coverFocusX : 50,
+      focusY: typeof s.data.coverFocusY === 'number' ? s.data.coverFocusY : 50,
+      zoom: typeof s.data.coverZoom === 'number' ? s.data.coverZoom : 1,
+    },
+    frames: fullGallery,
+  };
+});
+
+const homeHeroSection = {
+  slug: 'home-hero',
+  title: 'Home Hero Carousel',
+  group: 'Homepage',
+  liveUrl: '/',
+  coverImage: homeHeroData[0]?.src || '/images/hero/slide-01.svg',
+  copy: { ...pageCopy.homeHero },
+  frames: homeHeroData.map((h) => ({
+    src: resolveMediaUrl(h.src),
+    alt: h.title || h.alt || 'Hero Slide',
+    aspect: h.aspect === 'portrait' ? 'portrait' : 'landscape',
+    meta: h.meta || '',
+    focusX: typeof (h as any).focusX === 'number' ? (h as any).focusX : 65,
+    focusY: typeof (h as any).focusY === 'number' ? (h as any).focusY : 50,
+    zoom: typeof (h as any).zoom === 'number' ? (h as any).zoom : 1,
+  })),
+};
+
+const homeGallerySection = {
+  slug: 'home-gallery',
+  title: 'Home Gallery',
+  group: 'Homepage',
+  liveUrl: '/#gallery-archive',
+  coverImage: homeGalleryData[0]?.src || '/images/hero/slide-01.svg',
+  frames: homeGalleryData.map((g) => ({
+    src: resolveMediaUrl(g.src),
+    alt: g.title || g.alt || 'Gallery Frame',
+    aspect: g.aspect === 'portrait' ? 'portrait' : 'landscape',
+    meta: g.meta || '',
+    category: g.category || 'Motorsport',
+  })),
+};
+
+const homeAgencySection = {
+  slug: 'home-agency',
+  title: 'Home Agency',
+  group: 'Homepage',
+  liveUrl: '/',
+  isTextOnly: true,
+  copy: { ...pageCopy.homeAgency },
+  frames: [],
+};
+
+const portfolioPageSection = {
+  slug: 'portfolio-page',
+  title: 'Portfolio Header',
+  group: 'Homepage',
+  liveUrl: '/gallery',
+  isTextOnly: true,
+  copy: { ...pageCopy.portfolioHeader },
+  frames: [],
+};
+
+const aboutPhotoSection = {
+  slug: 'about-photo',
+  title: 'About Page',
+  group: 'Homepage',
+  liveUrl: '/about',
+  coverImage: resolveMediaUrl(aboutProfileData.src),
+  copy: {
+    ...pageCopy.aboutIntro,
+    fullBio: [...pageCopy.aboutIntro.fullBio],
+  },
+  experiences: allExperiences,
+  aboutMap: aboutSeriesMap,
+  frames: [
+    {
+      src: resolveMediaUrl(aboutProfileData.src),
+      alt: aboutProfileData.alt || 'Shu Zelin — Trackside Portrait',
+      aspect: 'portrait',
+      focusX: typeof aboutProfileData.focusX === 'number' ? aboutProfileData.focusX : 50,
+      focusY: typeof aboutProfileData.focusY === 'number' ? aboutProfileData.focusY : 50,
+      zoom: typeof aboutProfileData.zoom === 'number' ? aboutProfileData.zoom : 1,
+    },
+  ],
+};
+
+const allSections = [
+  homeHeroSection,
+  homeGallerySection,
+  homeAgencySection,
+  portfolioPageSection,
+  aboutPhotoSection,
+  ...gallerySeriesData,
+];
+---
+
+<BaseLayout title="The Darkroom" description="Private Visual Curation Desk">
+  <div class="min-h-screen bg-surface-950 pb-28 font-sans text-surface-100">
+    <!-- Top Persistent Control Bar -->
+    <header class="sticky top-0 z-50 border-b border-secondary/20 bg-surface-950/95 backdrop-blur-md py-3.5 shadow-xl">
+      <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-4 sm:px-8">
+        <!-- Brand / Context -->
+        <div class="flex items-center">
+          <div>
+            <div class="flex items-center gap-2">
+              <h1 class="text-base font-semibold tracking-tight text-white">The Darkroom</h1>
+              <span class="rounded-full border border-secondary/30 bg-surface-900 px-2.5 py-0.5 text-[11px] font-medium text-secondary">
+                Private Curation Desk
+              </span>
+              <span id="darkroom-auth-badge" class="hidden items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-950/30 px-2.5 py-0.5 text-[11px] text-emerald-300">
+                <span id="darkroom-auth-user"></span>
+                <a href="/.auth/logout?post_logout_redirect_uri=/" class="underline hover:text-white">Sign Out</a>
+              </span>
+            </div>
+            <p id="stats-counter" class="text-xs text-secondary">Loading frames...</p>
+          </div>
+        </div>
+
+        <!-- Global Action Buttons -->
+        <div class="flex flex-wrap items-center gap-2.5">
+          <button
+            id="add-frame-btn"
+            type="button"
+            class="inline-flex items-center gap-1.5 rounded-lg border border-secondary/30 bg-surface-900 px-3.5 py-1.5 text-xs font-medium text-surface-100 transition hover:border-secondary/60 hover:bg-surface-850"
+          >
+            <span>+</span>
+            <span>Add Frame</span>
+          </button>
+
+          <button
+            id="view-live-btn"
+            type="button"
+            disabled
+            class="inline-flex items-center gap-1.5 rounded-lg border border-secondary/30 bg-surface-900 px-3.5 py-1.5 text-xs font-medium text-surface-100 transition hover:border-secondary hover:text-white disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-secondary/30 disabled:hover:text-surface-100"
+            title="Preview your unsaved changes live without publishing"
+          >
+            <span>Preview Live ↗</span>
+          </button>
+
+          <button
+            id="reset-btn"
+            type="button"
+            class="rounded-lg border border-secondary/20 px-3.5 py-1.5 text-xs font-medium text-secondary transition hover:bg-surface-900 hover:text-white"
+          >
+            Reset
+          </button>
+
+          <button
+            id="save-publish-btn"
+            type="button"
+            disabled
+            class="inline-flex items-center gap-2 rounded-lg bg-surface-100 px-4 py-1.5 text-xs font-semibold text-surface-950 shadow-md transition hover:bg-white active:scale-98 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-surface-100"
+          >
+            <span id="save-status-dot" class="h-2 w-2 rounded-full bg-emerald-500"></span>
+            <span id="save-btn-text">Save Changes</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="mx-auto max-w-7xl px-4 sm:px-8 pt-8">
+      <!-- Category Switcher Tabs Grouped -->
+      <section class="mb-8 space-y-5">
+        <!-- Homepage Group -->
+        <div>
+          <div class="flex items-center justify-between pb-2">
+            <span class="text-xs font-semibold uppercase tracking-wider text-surface-200">Homepage Sections</span>
+            <span class="text-xs text-secondary">Main landing page imagery</span>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            {allSections.filter((s) => s.group === 'Homepage').map((s) => (
+              <button
+                type="button"
+                data-slug={s.slug}
+                class="category-tab rounded-xl border border-secondary/25 bg-surface-900/80 px-4 py-2 text-xs font-medium text-secondary hover:border-secondary/50 hover:text-white transition-all duration-200"
+              >
+                {s.title}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <!-- Gallery Pages Group -->
+        <div>
+          <div class="flex items-center justify-between pb-2">
+            <span class="text-xs font-semibold uppercase tracking-wider text-surface-200">Gallery Series</span>
+            <span class="text-xs text-secondary">Individual motorsport categories</span>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            {allSections.filter((s) => s.group === 'Gallery Pages').map((s) => (
+              <button
+                type="button"
+                data-slug={s.slug}
+                class="category-tab rounded-xl border border-secondary/25 bg-surface-900/80 px-4 py-2 text-xs font-medium text-secondary hover:border-secondary/50 hover:text-white transition-all duration-200"
+              >
+                {s.title}
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <!-- Dynamic Text & Content Editor Panel -->
+      <section id="text-editor-panel" class="mb-8 hidden"></section>
+
+      <!-- Drag & Drop Bulk Upload Zone + Azure WebP Conversion Pipeline -->
+      <section id="dropzone-section" class="mb-8">
+        <div class="mb-2.5 flex flex-wrap items-center justify-between gap-2">
+          <div class="flex items-center gap-2">
+            <span class="inline-flex h-2 w-2 rounded-full bg-emerald-400"></span>
+            <span class="text-xs font-medium text-surface-200">
+              Azure Smart Image Optimizer Active
+            </span>
+          </div>
+          <span id="optimizer-profile-label" class="text-xs text-secondary">
+            Auto-converts uploads to WebP · Max 1600px (2400px Hero) · Target ≤ 280 KB
+          </span>
+        </div>
+
+        <label
+          for="bulk-file-input"
+          id="dropzone"
+          class="group flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-secondary/30 bg-surface-900/40 p-6 text-center transition-all duration-200 hover:border-surface-100 hover:bg-surface-900/70"
+        >
+          <div class="flex h-12 w-12 items-center justify-center rounded-full border border-secondary/30 bg-surface-850 text-secondary transition-colors group-hover:border-surface-100 group-hover:text-white">
+            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <span class="mt-3 text-sm font-medium text-surface-100">
+            Drop new photos here or click to browse
+          </span>
+          <span class="mt-1 text-xs text-secondary">
+            Automatically resizes, compresses to high-clarity WebP for Azure hosting, and detects 4:3 / 3:4 orientation
+          </span>
+          <input
+            id="bulk-file-input"
+            type="file"
+            multiple
+            accept="image/*"
+            class="hidden"
+          />
+        </label>
+      </section>
+
+      <!-- Portfolio Cover Card Editor (Gallery Series only) -->
+      <section id="portfolio-cover-section" class="mb-8 hidden">
+        <div class="mb-3 flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center gap-2">
+            <h2 class="text-sm font-semibold uppercase tracking-wider text-surface-200">Portfolio Cover Card</h2>
+            <span class="text-xs text-secondary">(Shown on the /gallery Portfolio list)</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <button
+              id="cover-edit-framing-btn"
+              type="button"
+              class="inline-flex items-center gap-1.5 rounded-lg border border-secondary/30 bg-surface-900 px-3 py-1.5 text-xs font-medium text-white transition hover:border-white hover:bg-surface-850"
+            >
+              <span>✂ Edit Framing</span>
+            </button>
+            <button
+              id="cover-replace-btn"
+              type="button"
+              class="inline-flex items-center gap-1.5 rounded-lg border border-secondary/30 bg-surface-900 px-3 py-1.5 text-xs font-medium text-white transition hover:border-white hover:bg-surface-850"
+            >
+              <span>📷 Replace Cover</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="relative min-h-[140px] sm:aspect-[11/2] w-full overflow-hidden rounded-2xl border border-secondary/25 bg-surface-900 shadow-lg">
+          <div id="cover-preview-scale-wrap" class="h-full w-full">
+            <img
+              id="cover-preview-img"
+              src=""
+              alt="Portfolio cover preview"
+              class="h-full w-full object-cover"
+            />
+          </div>
+          <div class="pointer-events-none absolute inset-0 bg-gradient-to-br from-surface-950/85 via-surface-950/35 to-transparent"></div>
+          <div class="pointer-events-none relative z-10 flex h-full flex-col justify-start p-6 sm:p-7 md:p-8">
+            <h3 id="cover-preview-title" class="font-display text-2xl sm:text-3xl font-medium tracking-tight text-surface-100">
+              Series Title
+            </h3>
+          </div>
+        </div>
+      </section>
+
+      <!-- Waterfall Masonry Visual Workspace -->
+      <section id="waterfall-section">
+        <div class="mb-4 flex flex-wrap items-center justify-between gap-4 border-b border-secondary/15 pb-3">
+          <div class="flex items-center gap-2">
+            <h2 id="section-view-title" class="text-lg font-semibold tracking-tight text-white">Waterfall Grid Layout</h2>
+            <span class="text-xs text-secondary">(Exact live proportions & arrangement)</span>
+          </div>
+          <p class="text-xs text-secondary">
+            Drag cards to reorder · Toggle 4:3 ⇄ 3:4 · Click Replace to swap & optimize photo
+          </p>
+        </div>
+
+        <!-- Ordered Grid Container (strictly #01 to #0x left-to-right, top-to-bottom) -->
+        <div
+          id="frames-waterfall"
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 items-start"
+        >
+          <!-- Dynamically populated via JavaScript for instant drag/reorder/toggle -->
+        </div>
+      </section>
+    </main>
+
+    <!-- Hidden Single File Input for In-Card "Replace" Action & Cover Replace -->
+    <input id="single-replace-input" type="file" accept="image/*" class="hidden" />
+    <input id="cover-replace-input" type="file" accept="image/*" class="hidden" />
+
+    <!-- Hero Carousel Visual Framing Modal (Home Hero Carousel only) -->
+    <div
+      id="hero-crop-modal"
+      class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 p-4 backdrop-blur-sm"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="hero-crop-title"
+    >
+      <div class="w-full max-w-4xl overflow-hidden rounded-2xl border border-secondary/30 bg-surface-900 shadow-2xl">
+        <div class="flex items-center justify-between border-b border-secondary/20 px-5 py-3.5">
+          <div>
+            <h3 id="hero-crop-title" class="text-sm font-semibold text-white">Adjust Hero Carousel Framing</h3>
+            <p class="text-xs text-secondary">Drag the image to position what appears in the wide hero banner</p>
+          </div>
+          <span id="hero-crop-coords" class="rounded-md border border-secondary/25 bg-surface-950 px-2.5 py-1 text-xs text-surface-200">
+            65% · 50%
+          </span>
+        </div>
+
+        <div class="p-5 space-y-4">
+          <!-- Exact 5:2 Hero Banner or 11:2 Portfolio Cover Preview -->
+          <div
+            id="hero-crop-stage"
+            class="relative w-full aspect-[5/2] cursor-grab active:cursor-grabbing overflow-hidden rounded-xl border border-secondary/30 bg-[#17191c] select-none"
+          >
+            <div
+              id="hero-crop-mask-wrap"
+              class="h-full w-full pointer-events-none"
+              style="-webkit-mask-image: radial-gradient(ellipse 82% 115% at 10% 22%, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.28) 14%, rgba(0,0,0,0.36) 28%, rgba(0,0,0,0.50) 42%, rgba(0,0,0,0.68) 56%, rgba(0,0,0,0.85) 70%, rgba(0,0,0,0.96) 84%, black 95%), linear-gradient(to bottom, transparent 0%, black 6%, black 92%, transparent 100%); mask-image: radial-gradient(ellipse 82% 115% at 10% 22%, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.28) 14%, rgba(0,0,0,0.36) 28%, rgba(0,0,0,0.50) 42%, rgba(0,0,0,0.68) 56%, rgba(0,0,0,0.85) 70%, rgba(0,0,0,0.96) 84%, black 95%), linear-gradient(to bottom, transparent 0%, black 6%, black 92%, transparent 100%); -webkit-mask-composite: destination-in; mask-composite: intersect;"
+            >
+              <img
+                id="hero-crop-img"
+                src=""
+                alt="Framing preview"
+                draggable="false"
+                class="h-full w-full object-cover pointer-events-none"
+              />
+            </div>
+            <!-- Cover Card Gradient Overlay (visible in cover mode) -->
+            <div
+              id="cover-crop-gradient"
+              class="pointer-events-none absolute inset-0 hidden bg-gradient-to-br from-surface-950/85 via-surface-950/35 to-transparent"
+            ></div>
+            <!-- Ghosted Top-Left Hero Guide -->
+            <div id="hero-crop-guide" class="pointer-events-none absolute left-6 top-6 max-w-[44%] drop-shadow-[0_2px_10px_rgba(0,0,0,0.65)]">
+              <div class="text-sm sm:text-base font-medium text-white">Motorsport Images at Paddocker</div>
+              <div class="mt-1 text-[10px] text-white/90">Motorsport photography trackside and in the paddock.</div>
+              <div class="mt-3 inline-block rounded-full bg-surface-100 px-3 py-1 text-[10px] font-semibold text-surface-950">
+                Download Portfolio PDF
+              </div>
+            </div>
+            <!-- Ghosted Top-Left Cover Card Guide -->
+            <div id="cover-crop-guide" class="pointer-events-none absolute left-6 top-5 hidden">
+              <div id="cover-crop-guide-title" class="font-display text-2xl font-medium tracking-tight text-surface-100">Series Title</div>
+            </div>
+          </div>
+
+          <!-- Zoom Slider -->
+          <div class="flex items-center gap-4">
+            <label for="hero-crop-zoom" class="text-xs font-medium text-secondary whitespace-nowrap">Zoom</label>
+            <input
+              id="hero-crop-zoom"
+              type="range"
+              min="1"
+              max="2"
+              step="0.02"
+              value="1"
+              class="h-1.5 w-full cursor-pointer accent-surface-100"
+            />
+            <span id="hero-crop-zoom-val" class="w-12 text-right text-xs font-medium text-surface-200">100%</span>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between gap-3 border-t border-secondary/20 bg-surface-950/60 px-5 py-3.5">
+          <button
+            id="hero-crop-reset"
+            type="button"
+            class="rounded-lg border border-secondary/25 px-3 py-1.5 text-xs font-medium text-secondary transition hover:bg-surface-850 hover:text-white"
+          >
+            Reset Center (50% · 50%)
+          </button>
+          <div class="flex items-center gap-2.5">
+            <button
+              id="hero-crop-cancel"
+              type="button"
+              class="rounded-lg border border-secondary/25 px-3.5 py-1.5 text-xs font-medium text-secondary transition hover:bg-surface-850 hover:text-white"
+            >
+              Cancel
+            </button>
+            <button
+              id="hero-crop-apply"
+              type="button"
+              class="rounded-lg bg-surface-100 px-4 py-1.5 text-xs font-semibold text-surface-950 transition hover:bg-white"
+            >
+              Apply Framing
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div
+      id="toast"
+      class="fixed bottom-6 right-6 z-50 flex items-center gap-3 rounded-xl border border-secondary/30 bg-surface-900/95 px-4 py-3 text-xs font-medium text-white shadow-2xl backdrop-blur-md transition-all duration-300 translate-y-20 opacity-0 pointer-events-none"
+    >
+      <span id="toast-icon" class="text-emerald-400">✓</span>
+      <span id="toast-msg">Changes saved!</span>
+    </div>
+  </div>
+
+  <script is:inline define:vars={{ initialSectionsData: allSections }}>
+    // Darkroom Client-side State (preserve active tab across HMR/saves via URL hash & sessionStorage)
+    const validSlugs = new Set(initialSectionsData.map((s) => s.slug));
+    const hashSlug = window.location.hash ? window.location.hash.slice(1) : '';
+    const storedSlug = sessionStorage.getItem('darkroom_active_slug') || '';
+    let currentSectionSlug = validSlugs.has(hashSlug)
+      ? hashSlug
+      : validSlugs.has(storedSlug)
+        ? storedSlug
+        : initialSectionsData[0].slug;
+    let sectionsState = JSON.parse(JSON.stringify(initialSectionsData));
+    let replaceTargetIndex = null;
+    let draggedIndex = null;
+
+    const waterfall = document.getElementById('frames-waterfall');
+    const statsCounter = document.getElementById('stats-counter');
+    const viewLiveBtn = document.getElementById('view-live-btn');
+    const sectionViewTitle = document.getElementById('section-view-title');
+    const optimizerProfileLabel = document.getElementById('optimizer-profile-label');
+    const categoryTabs = document.querySelectorAll('.category-tab');
+    const singleReplaceInput = document.getElementById('single-replace-input');
+    const bulkFileInput = document.getElementById('bulk-file-input');
+    const dropzone = document.getElementById('dropzone');
+    const addFrameBtn = document.getElementById('add-frame-btn');
+    const resetBtn = document.getElementById('reset-btn');
+    const savePublishBtn = document.getElementById('save-publish-btn');
+    const saveStatusDot = document.getElementById('save-status-dot');
+    const saveBtnText = document.getElementById('save-btn-text');
+    const toast = document.getElementById('toast');
+    const toastMsg = document.getElementById('toast-msg');
+
+    /**
+     * Optimization Profiles for Azure Hosting:
+     * Balances crisp Retina visual fidelity with minimal KB payload for fast loading.
+     * - Hero Carousel: up to 2400px long edge, target <= 450 KB, WebP quality 86% -> 74%
+     * - Gallery / Waterfall: up to 1600px long edge (1600x1200 or 1200x1600), target <= 280 KB, WebP quality 84% -> 72%
+     */
+    function getOptimizationProfile(sectionSlug) {
+      if (sectionSlug === 'home-hero') {
+        return {
+          maxDimension: 2400,
+          targetMaxBytes: 450 * 1024,
+          initialQuality: 0.86,
+          minQuality: 0.74,
+          label: 'Hero Profile: WebP · Max 2400px · Target ≤ 450 KB',
+        };
+      }
+      return {
+        maxDimension: 1600,
+        targetMaxBytes: 280 * 1024,
+        initialQuality: 0.84,
+        minQuality: 0.72,
+        label: 'Gallery Profile: WebP · Max 1600px (4:3 / 3:4) · Target ≤ 280 KB',
+      };
+    }
+
+    function formatBytes(bytes) {
+      if (!bytes || bytes <= 0) return '0 KB';
+      if (bytes < 1024) return `${bytes} B`;
+      const kb = bytes / 1024;
+      if (kb < 1024) return `${Math.round(kb)} KB`;
+      return `${(kb / 1024).toFixed(2)} MB`;
+    }
+
+    function blobToDataUrl(blob) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(new Error('Failed to read image data'));
+        reader.readAsDataURL(blob);
+      });
+    }
+
+    /**
+     * Converts and compresses an uploaded image File into an Azure-ready WebP blob.
+     * Enforces maximum dimension cap while iteratively tuning quality to stay within byte budget.
+     */
+    async function optimizeImageForAzure(file, sectionSlug) {
+      const cleanBaseName = file.name.replace(/\.[^/.]+$/, '');
+
+      // Pass through SVG vector files untouched
+      if (file.type === 'image/svg+xml') {
+        const objectUrl = URL.createObjectURL(file);
+        const dataUrl = await blobToDataUrl(file);
+        return {
+          src: objectUrl,
+          dataUrl,
+          alt: cleanBaseName,
+          aspect: 'landscape',
+          fileName: file.name,
+          conversionMeta: `SVG · ${formatBytes(file.size)}`,
+        };
+      }
+
+      const profile = getOptimizationProfile(sectionSlug);
+      const bitmapUrl = URL.createObjectURL(file);
+
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => {
+          URL.revokeObjectURL(bitmapUrl);
+
+          const origW = img.naturalWidth || img.width;
+          const origH = img.naturalHeight || img.height;
+          const detectedAspect = origH > origW ? 'portrait' : 'landscape';
+
+          // Scale proportionally so the longest side never exceeds profile.maxDimension (never upscale)
+          const longestEdge = Math.max(origW, origH);
+          const scale = longestEdge > profile.maxDimension ? profile.maxDimension / longestEdge : 1;
+          const targetW = Math.max(1, Math.round(origW * scale));
+          const targetH = Math.max(1, Math.round(origH * scale));
+
+          const canvas = document.createElement('canvas');
+          canvas.width = targetW;
+          canvas.height = targetH;
+
+          const ctx = canvas.getContext('2d');
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = 'high';
+          ctx.drawImage(img, 0, 0, targetW, targetH);
+
+          // Iteratively encode WebP to find the highest quality that fits within targetMaxBytes
+          let currentQuality = profile.initialQuality;
+
+          function attemptEncode() {
+            canvas.toBlob(
+              async (blob) => {
+                if (!blob) {
+                  reject(new Error('Image encoding failed'));
+                  return;
+                }
+
+                if (blob.size > profile.targetMaxBytes && currentQuality > profile.minQuality + 0.01) {
+                  currentQuality = Math.max(profile.minQuality, currentQuality - 0.04);
+                  attemptEncode();
+                  return;
+                }
+
+                const optimizedUrl = URL.createObjectURL(blob);
+                const dataUrl = await blobToDataUrl(blob);
+                const savedRatio =
+                  file.size > blob.size
+                    ? Math.round(((file.size - blob.size) / file.size) * 100)
+                    : 0;
+                const savingsBadge = savedRatio > 0 ? ` (-${savedRatio}%)` : '';
+                const webpFileName = `${cleanBaseName.toLowerCase().replace(/[^a-z0-9-_]+/g, '-')}.webp`;
+
+                resolve({
+                  src: optimizedUrl,
+                  dataUrl,
+                  alt: cleanBaseName,
+                  aspect: detectedAspect,
+                  fileName: webpFileName,
+                  conversionMeta: `WebP · ${targetW}×${targetH} · ${formatBytes(blob.size)}${savingsBadge}`,
+                });
+              },
+              'image/webp',
+              currentQuality
+            );
+          }
+
+          attemptEncode();
+        };
+
+        img.onerror = () => {
+          URL.revokeObjectURL(bitmapUrl);
+          reject(new Error('Could not decode image file'));
+        };
+
+        img.src = bitmapUrl;
+      });
+    }
+
+    function getCurrentSection() {
+      return sectionsState.find((s) => s.slug === currentSectionSlug);
+    }
+
+    function showToast(message) {
+      toastMsg.textContent = message;
+      toast.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+      toast.classList.add('translate-y-0', 'opacity-100');
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+      }, 3200);
+    }
+
+    const unsavedSlugs = new Set();
+
+    function updateActionButtonsState() {
+      const isDirty = unsavedSlugs.has(currentSectionSlug);
+      viewLiveBtn.disabled = !isDirty;
+      savePublishBtn.disabled = !isDirty;
+      if (isDirty) {
+        saveStatusDot.classList.remove('bg-emerald-500');
+        saveStatusDot.classList.add('bg-amber-400');
+        saveBtnText.textContent = 'Save Changes (Unsaved)';
+      } else {
+        saveStatusDot.classList.remove('bg-amber-400');
+        saveStatusDot.classList.add('bg-emerald-500');
+        saveBtnText.textContent = 'Save Changes';
+      }
+    }
+
+    function markUnsaved(slug = currentSectionSlug) {
+      unsavedSlugs.add(slug);
+      updateActionButtonsState();
+    }
+
+    function markSaved(slug = currentSectionSlug) {
+      unsavedSlugs.delete(slug);
+      updateActionButtonsState();
+    }
+
+    function updateActiveTabHighlight() {
+      categoryTabs.forEach((tab) => {
+        if (tab.dataset.slug === currentSectionSlug) {
+          tab.classList.remove('border-secondary/25', 'bg-surface-900/80', 'text-secondary');
+          tab.classList.add('active-tab', 'border-surface-100', 'bg-surface-100', 'text-surface-950', 'font-semibold', 'shadow-md');
+        } else {
+          tab.classList.remove('active-tab', 'border-surface-100', 'bg-surface-100', 'text-surface-950', 'font-semibold', 'shadow-md');
+          tab.classList.add('border-secondary/25', 'bg-surface-900/80', 'text-secondary');
+        }
+      });
+    }
+
+    function escapeAttr(val) {
+      return String(val ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    }
+
+    function renderTextEditor(section) {
+      const panel = document.getElementById('text-editor-panel');
+      if (!panel) return;
+
+      // Home Gallery has no text editor per user request
+      if (section.slug === 'home-gallery') {
+        panel.classList.add('hidden');
+        panel.innerHTML = '';
+        return;
+      }
+
+      panel.classList.remove('hidden');
+      const inputCls =
+        'w-full rounded-lg border border-secondary/25 bg-surface-950/90 px-3 py-2 text-sm text-surface-100 placeholder:text-secondary/50 focus:border-surface-100 focus:outline-none';
+      const labelCls = 'block text-xs font-medium text-secondary mb-1.5';
+
+      if (section.slug === 'home-hero' && section.copy) {
+        panel.innerHTML = `
+          <div class="rounded-2xl border border-secondary/25 bg-surface-900/50 p-5 sm:p-6 space-y-4">
+            <div class="flex items-center justify-between border-b border-secondary/15 pb-3">
+              <h2 class="text-sm font-semibold uppercase tracking-wider text-surface-200">Hero Copy &amp; Button</h2>
+              <span class="text-xs text-secondary">Displayed at top-left of Homepage Hero</span>
+            </div>
+            <div class="grid gap-4 sm:grid-cols-2">
+              <div>
+                <label class="${labelCls}">Hero Heading</label>
+                <input type="text" data-copy-key="heading" value="${escapeAttr(section.copy.heading)}" class="${inputCls}" />
+              </div>
+              <div>
+                <label class="${labelCls}">Download Button Text</label>
+                <input type="text" data-copy-key="ctaLabel" value="${escapeAttr(section.copy.ctaLabel)}" class="${inputCls}" />
+              </div>
+              <div class="sm:col-span-2">
+                <label class="${labelCls}">Hero Bio / Subtitle</label>
+                <input type="text" data-copy-key="bio" value="${escapeAttr(section.copy.bio)}" class="${inputCls}" />
+              </div>
+            </div>
+          </div>
+        `;
+      } else if (section.slug === 'home-agency' && section.copy) {
+        panel.innerHTML = `
+          <div class="rounded-2xl border border-secondary/25 bg-surface-900/50 p-5 sm:p-6 space-y-4">
+            <div class="flex items-center justify-between border-b border-secondary/15 pb-3">
+              <h2 class="text-sm font-semibold uppercase tracking-wider text-surface-200">Home Agency Overview</h2>
+              <span class="text-xs text-secondary">Displayed below Gallery on Homepage</span>
+            </div>
+            <div class="grid gap-4 sm:grid-cols-2">
+              <div>
+                <label class="${labelCls}">Eyebrow Label</label>
+                <input type="text" data-copy-key="eyebrow" value="${escapeAttr(section.copy.eyebrow)}" class="${inputCls}" />
+              </div>
+              <div>
+                <label class="${labelCls}">Main Heading</label>
+                <input type="text" data-copy-key="heading" value="${escapeAttr(section.copy.heading)}" class="${inputCls}" />
+              </div>
+              <div class="sm:col-span-2">
+                <label class="${labelCls}">Paragraph 1</label>
+                <textarea rows="3" data-copy-key="paragraph1" class="${inputCls}">${escapeAttr(section.copy.paragraph1)}</textarea>
+              </div>
+              <div class="sm:col-span-2">
+                <label class="${labelCls}">Paragraph 2</label>
+                <textarea rows="3" data-copy-key="paragraph2" class="${inputCls}">${escapeAttr(section.copy.paragraph2)}</textarea>
+              </div>
+            </div>
+          </div>
+        `;
+      } else if (section.slug === 'portfolio-page' && section.copy) {
+        panel.innerHTML = `
+          <div class="rounded-2xl border border-secondary/25 bg-surface-900/50 p-5 sm:p-6 space-y-4">
+            <div class="flex items-center justify-between border-b border-secondary/15 pb-3">
+              <h2 class="text-sm font-semibold uppercase tracking-wider text-surface-200">Portfolio Page Header</h2>
+              <span class="text-xs text-secondary">Displayed at top of /gallery</span>
+            </div>
+            <div>
+              <label class="${labelCls}">Main Heading</label>
+              <input type="text" data-copy-key="heading" value="${escapeAttr(section.copy.heading)}" class="${inputCls}" />
+            </div>
+          </div>
+        `;
+      } else if (section.slug === 'about-photo' && section.copy) {
+        const fullBioText = Array.isArray(section.copy.fullBio) ? section.copy.fullBio.join('\n\n') : '';
+        const expCardsHtml = (section.experiences || [])
+          .map(
+            (exp, idx) => `
+            <div class="rounded-xl border border-secondary/20 bg-surface-950/60 p-4 space-y-3" data-exp-idx="${idx}">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold text-surface-200">Experience #${idx + 1}</span>
+                <button type="button" class="btn-del-exp text-xs text-red-400 hover:text-red-300" data-exp-idx="${idx}">Remove</button>
+              </div>
+              <div class="grid gap-3 sm:grid-cols-2">
+                <div>
+                  <label class="${labelCls}">Role / Title</label>
+                  <input type="text" data-exp-field="role" data-exp-idx="${idx}" value="${escapeAttr(exp.role)}" class="${inputCls}" />
+                </div>
+                <div>
+                  <label class="${labelCls}">Organization</label>
+                  <input type="text" data-exp-field="organization" data-exp-idx="${idx}" value="${escapeAttr(exp.organization)}" class="${inputCls}" />
+                </div>
+                <div>
+                  <label class="${labelCls}">Category Type</label>
+                  <select data-exp-field="type" data-exp-idx="${idx}" class="${inputCls}">
+                    <option value="Photography & Creative" ${exp.type === 'Photography & Creative' ? 'selected' : ''}>Photography & Creative</option>
+                    <option value="Professional Experience" ${exp.type === 'Professional Experience' ? 'selected' : ''}>Professional Experience</option>
+                    <option value="Exhibition & Recognition" ${exp.type === 'Exhibition & Recognition' ? 'selected' : ''}>Exhibition & Recognition</option>
+                  </select>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                  <div>
+                    <label class="${labelCls}">Period</label>
+                    <input type="text" data-exp-field="period" data-exp-idx="${idx}" value="${escapeAttr(exp.period)}" class="${inputCls}" />
+                  </div>
+                  <div>
+                    <label class="${labelCls}">Location</label>
+                    <input type="text" data-exp-field="location" data-exp-idx="${idx}" value="${escapeAttr(exp.location)}" class="${inputCls}" />
+                  </div>
+                </div>
+                <div class="sm:col-span-2">
+                  <label class="${labelCls}">Summary</label>
+                  <textarea rows="2" data-exp-field="summary" data-exp-idx="${idx}" class="${inputCls}">${escapeAttr(exp.summary)}</textarea>
+                </div>
+                <div class="sm:col-span-2">
+                  <label class="${labelCls}">Highlights (one bullet per line)</label>
+                  <textarea rows="3" data-exp-field="highlights" data-exp-idx="${idx}" class="${inputCls}">${escapeAttr((exp.highlights || []).join('\n'))}</textarea>
+                </div>
+              </div>
+            </div>
+          `
+          )
+          .join('');
+
+        panel.innerHTML = `
+          <div class="space-y-6">
+            <!-- Intro Copy -->
+            <div class="rounded-2xl border border-secondary/25 bg-surface-900/50 p-5 sm:p-6 space-y-4">
+              <div class="flex items-center justify-between border-b border-secondary/15 pb-3">
+                <h2 class="text-sm font-semibold uppercase tracking-wider text-surface-200">About — Introduction Copy</h2>
+                <span class="text-xs text-secondary">Displayed in Section 1 of /about</span>
+              </div>
+              <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                <div>
+                  <label class="${labelCls}">Eyebrow</label>
+                  <input type="text" data-copy-key="eyebrow" value="${escapeAttr(section.copy.eyebrow)}" class="${inputCls}" />
+                </div>
+                <div>
+                  <label class="${labelCls}">Name</label>
+                  <input type="text" data-copy-key="name" value="${escapeAttr(section.copy.name)}" class="${inputCls}" />
+                </div>
+                <div>
+                  <label class="${labelCls}">Next Event Label</label>
+                  <input type="text" data-copy-key="nextEventLabel" value="${escapeAttr(section.copy.nextEventLabel || 'Next Event')}" class="${inputCls}" />
+                </div>
+                <div>
+                  <label class="${labelCls}">Next Event Name</label>
+                  <input type="text" data-copy-key="nextEventName" value="${escapeAttr(section.copy.nextEventName || '')}" class="${inputCls}" />
+                </div>
+                <div>
+                  <label class="${labelCls}">Event Location</label>
+                  <input type="text" data-copy-key="nextEventLocation" value="${escapeAttr(section.copy.nextEventLocation || section.copy.location || '')}" class="${inputCls}" />
+                </div>
+                <div>
+                  <label class="${labelCls}">Event Date</label>
+                  <input type="text" data-copy-key="nextEventDate" value="${escapeAttr(section.copy.nextEventDate || '')}" class="${inputCls}" />
+                </div>
+                <div class="sm:col-span-2 lg:col-span-3">
+                  <label class="${labelCls}">Lead Bio Paragraph</label>
+                  <textarea rows="2" data-copy-key="shortBio" class="${inputCls}">${escapeAttr(section.copy.shortBio)}</textarea>
+                </div>
+                <div class="sm:col-span-2 lg:col-span-3">
+                  <label class="${labelCls}">Additional Bio Paragraphs (separate paragraphs with a blank line)</label>
+                  <textarea rows="4" data-copy-key="fullBio" class="${inputCls}">${escapeAttr(fullBioText)}</textarea>
+                </div>
+              </div>
+            </div>
+
+            <!-- About: Series I've Worked With Editor -->
+            <div class="rounded-2xl border border-secondary/25 bg-surface-900/50 p-5 sm:p-6 space-y-4">
+              <div class="flex flex-wrap items-center justify-between gap-2 border-b border-secondary/15 pb-3">
+                <div>
+                  <h2 class="text-sm font-semibold uppercase tracking-wider text-surface-200">About — Series I’ve Worked With</h2>
+                  <span class="text-xs text-secondary">Displayed in the left panel &amp; detail card on /about</span>
+                </div>
+                <button id="btn-add-about-series" type="button" class="rounded-lg border border-secondary/30 bg-surface-950 px-3 py-1.5 text-xs font-medium text-white hover:border-white">
+                  + Add Series
+                </button>
+              </div>
+              <div class="grid gap-3 sm:grid-cols-2">
+                ${(section.aboutMap?.series || [])
+                  .map(
+                    (s, idx) => `
+                  <div class="rounded-xl border border-secondary/20 bg-surface-950/60 p-3.5 space-y-2.5">
+                    <div class="flex items-center justify-between">
+                      <span class="text-xs font-semibold text-surface-200">#${String(idx + 1).padStart(2, '0')} · ${escapeAttr(s.id)}</span>
+                      <button type="button" class="btn-del-about-series text-xs text-red-400 hover:text-red-300" data-s-idx="${idx}">Remove</button>
+                    </div>
+                    <div>
+                      <label class="${labelCls}">Series Title</label>
+                      <input type="text" data-about-series-field="title" data-s-idx="${idx}" value="${escapeAttr(s.title)}" class="${inputCls}" />
+                    </div>
+                    <div>
+                      <label class="${labelCls}">Short Description</label>
+                      <input type="text" data-about-series-field="subtitle" data-s-idx="${idx}" value="${escapeAttr(s.subtitle)}" class="${inputCls}" />
+                    </div>
+                  </div>
+                `
+                  )
+                  .join('')}
+              </div>
+            </div>
+
+            <!-- About: Map Tracks & Dot Parameters Editor -->
+            <div class="rounded-2xl border border-secondary/25 bg-surface-900/50 p-5 sm:p-6 space-y-4">
+              <div class="flex flex-wrap items-center justify-between gap-2 border-b border-secondary/15 pb-3">
+                <div>
+                  <h2 class="text-sm font-semibold uppercase tracking-wider text-surface-200">About — Map Tracks &amp; Dot Parameters</h2>
+                  <p class="text-xs text-secondary mt-0.5">
+                    Projection (1000×560, 30°E→180°E, 50°N→50°S): <code class="text-surface-200">x = (lon - 30) * 6.667 + dx</code>, <code class="text-surface-200">y = (50 - lat) * 5.6 + dy</code>
+                  </p>
+                </div>
+                <button id="btn-add-about-track" type="button" class="rounded-lg border border-secondary/30 bg-surface-950 px-3 py-1.5 text-xs font-medium text-white hover:border-white">
+                  + Add Track
+                </button>
+              </div>
+              <div class="space-y-3">
+                ${(section.aboutMap?.tracks || [])
+                  .map(
+                    (t, tIdx) => `
+                  <div class="rounded-xl border border-secondary/20 bg-surface-950/60 p-4 space-y-3">
+                    <div class="flex items-center justify-between">
+                      <span class="text-xs font-semibold text-surface-200">Track #${String(tIdx + 1).padStart(2, '0')}</span>
+                      <button type="button" class="btn-del-about-track text-xs text-red-400 hover:text-red-300" data-t-idx="${tIdx}">Remove</button>
+                    </div>
+                    <div class="grid gap-3 sm:grid-cols-6">
+                      <div class="sm:col-span-2">
+                        <label class="${labelCls}">Track Name</label>
+                        <input type="text" data-track-field="name" data-t-idx="${tIdx}" value="${escapeAttr(t.name)}" class="${inputCls}" />
+                      </div>
+                      <div>
+                        <label class="${labelCls}">Lat (°N+/°S-)</label>
+                        <input type="number" step="0.01" data-track-field="lat" data-t-idx="${tIdx}" value="${t.lat}" class="${inputCls}" />
+                      </div>
+                      <div>
+                        <label class="${labelCls}">Lon (°E)</label>
+                        <input type="number" step="0.01" data-track-field="lon" data-t-idx="${tIdx}" value="${t.lon}" class="${inputCls}" />
+                      </div>
+                      <div>
+                        <label class="${labelCls}">dx (px)</label>
+                        <input type="number" step="1" data-track-field="dx" data-t-idx="${tIdx}" value="${t.dx || 0}" class="${inputCls}" />
+                      </div>
+                      <div>
+                        <label class="${labelCls}">dy (px)</label>
+                        <input type="number" step="1" data-track-field="dy" data-t-idx="${tIdx}" value="${t.dy || 0}" class="${inputCls}" />
+                      </div>
+                    </div>
+                    <div>
+                      <label class="${labelCls}">Assigned Series</label>
+                      <div class="flex flex-wrap gap-2">
+                        ${(section.aboutMap?.series || [])
+                          .map((s) => {
+                            const checked = Array.isArray(t.seriesIds) && t.seriesIds.includes(s.id);
+                            return `
+                              <label class="inline-flex items-center gap-1.5 rounded-lg border ${checked ? 'border-emerald-500/50 bg-emerald-950/30 text-emerald-300' : 'border-secondary/20 bg-surface-900/60 text-secondary'} px-2.5 py-1 text-xs cursor-pointer">
+                                <input type="checkbox" class="track-series-chk accent-emerald-400" data-t-idx="${tIdx}" data-series-id="${escapeAttr(s.id)}" ${checked ? 'checked' : ''} />
+                                <span>${escapeAttr(s.title)}</span>
+                              </label>
+                            `;
+                          })
+                          .join('')}
+                      </div>
+                    </div>
+                  </div>
+                `
+                  )
+                  .join('')}
+              </div>
+            </div>
+          </div>
+        `;
+      } else if (section.group === 'Gallery Pages' && section.seriesMeta) {
+        panel.innerHTML = `
+          <div class="rounded-2xl border border-secondary/25 bg-surface-900/50 p-5 sm:p-6 space-y-4">
+            <div class="flex items-center justify-between border-b border-secondary/15 pb-3">
+              <h2 class="text-sm font-semibold uppercase tracking-wider text-surface-200">Series Title &amp; Description</h2>
+              <span class="text-xs text-secondary">Shown on Portfolio card, Gallery header, and About page</span>
+            </div>
+            <div class="grid gap-4 sm:grid-cols-2">
+              <div>
+                <label class="${labelCls}">Series Title</label>
+                <input type="text" data-series-key="title" value="${escapeAttr(section.seriesMeta.title)}" class="${inputCls}" />
+              </div>
+              <div>
+                <label class="${labelCls}">Short Description (shown on About)</label>
+                <input type="text" data-series-key="subtitle" value="${escapeAttr(section.seriesMeta.subtitle)}" class="${inputCls}" />
+              </div>
+            </div>
+          </div>
+        `;
+      } else {
+        panel.classList.add('hidden');
+        panel.innerHTML = '';
+        return;
+      }
+
+      // Bind copy inputs
+      panel.querySelectorAll('[data-copy-key]').forEach((el) => {
+        el.addEventListener('input', (e) => {
+          const key = e.target.dataset.copyKey;
+          if (key === 'fullBio') {
+            section.copy.fullBio = e.target.value
+              .split(/\n\s*\n/)
+              .map((p) => p.trim())
+              .filter(Boolean);
+          } else {
+            section.copy[key] = e.target.value;
+          }
+          markUnsaved(section.slug);
+        });
+      });
+
+      // Bind series meta inputs
+      panel.querySelectorAll('[data-series-key]').forEach((el) => {
+        el.addEventListener('input', (e) => {
+          const key = e.target.dataset.seriesKey;
+          section.seriesMeta[key] = e.target.value;
+          if (key === 'title') {
+            section.title = e.target.value;
+            const coverTitleEl = document.getElementById('cover-preview-title');
+            if (coverTitleEl) coverTitleEl.textContent = e.target.value;
+          }
+          markUnsaved(section.slug);
+        });
+      });
+
+      // Bind experience fields
+      panel.querySelectorAll('[data-exp-field]').forEach((el) => {
+        const evt = el.tagName === 'SELECT' ? 'change' : 'input';
+        el.addEventListener(evt, (e) => {
+          const idx = Number(e.target.dataset.expIdx);
+          const field = e.target.dataset.expField;
+          if (!section.experiences[idx]) return;
+          if (field === 'highlights') {
+            section.experiences[idx].highlights = e.target.value
+              .split('\n')
+              .map((line) => line.trim())
+              .filter(Boolean);
+          } else {
+            section.experiences[idx][field] = e.target.value;
+          }
+          markUnsaved(section.slug);
+        });
+      });
+
+      const addExpBtn = panel.querySelector('#btn-add-exp');
+      if (addExpBtn) {
+        addExpBtn.addEventListener('click', () => {
+          section.experiences = section.experiences || [];
+          section.experiences.push({
+            slug: `experience-${Date.now()}`,
+            role: 'New Role / Project',
+            organization: 'Organization',
+            type: 'Photography & Creative',
+            period: '2026',
+            location: 'Melbourne, AU',
+            current: false,
+            summary: '',
+            highlights: [],
+          });
+          markUnsaved(section.slug);
+          renderTextEditor(section);
+        });
+      }
+
+      panel.querySelectorAll('.btn-del-exp').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const idx = Number(btn.dataset.expIdx);
+          if (confirm(`Remove Experience #${idx + 1}?`)) {
+            section.experiences.splice(idx, 1);
+            markUnsaved(section.slug);
+            renderTextEditor(section);
+          }
+        });
+      });
+
+      // Bind About Series I've Worked With inputs
+      panel.querySelectorAll('[data-about-series-field]').forEach((el) => {
+        el.addEventListener('input', (e) => {
+          const idx = Number(e.target.dataset.sIdx);
+          const field = e.target.dataset.aboutSeriesField;
+          if (section.aboutMap?.series?.[idx]) {
+            section.aboutMap.series[idx][field] = e.target.value;
+            markUnsaved(section.slug);
+          }
+        });
+      });
+
+      const addAboutSeriesBtn = panel.querySelector('#btn-add-about-series');
+      if (addAboutSeriesBtn) {
+        addAboutSeriesBtn.addEventListener('click', () => {
+          section.aboutMap = section.aboutMap || { series: [], tracks: [] };
+          section.aboutMap.series.push({
+            id: `series-${Date.now()}`,
+            title: 'New Series',
+            subtitle: 'Short description of this series.',
+          });
+          markUnsaved(section.slug);
+          renderTextEditor(section);
+        });
+      }
+
+      panel.querySelectorAll('.btn-del-about-series').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const idx = Number(btn.dataset.sIdx);
+          const removed = section.aboutMap?.series?.[idx];
+          if (removed && confirm(`Remove series "${removed.title}"?`)) {
+            section.aboutMap.series.splice(idx, 1);
+            markUnsaved(section.slug);
+            renderTextEditor(section);
+          }
+        });
+      });
+
+      // Bind Track Name & Dot Parameter inputs
+      panel.querySelectorAll('[data-track-field]').forEach((el) => {
+        el.addEventListener('input', (e) => {
+          const idx = Number(e.target.dataset.tIdx);
+          const field = e.target.dataset.trackField;
+          if (!section.aboutMap?.tracks?.[idx]) return;
+          if (field === 'name') {
+            section.aboutMap.tracks[idx].name = e.target.value;
+          } else {
+            section.aboutMap.tracks[idx][field] = parseFloat(e.target.value) || 0;
+          }
+          markUnsaved(section.slug);
+        });
+      });
+
+      panel.querySelectorAll('.track-series-chk').forEach((chk) => {
+        chk.addEventListener('change', (e) => {
+          const idx = Number(e.target.dataset.tIdx);
+          const sId = e.target.dataset.seriesId;
+          const track = section.aboutMap?.tracks?.[idx];
+          if (!track) return;
+          track.seriesIds = Array.isArray(track.seriesIds) ? track.seriesIds : [];
+          if (e.target.checked) {
+            if (!track.seriesIds.includes(sId)) track.seriesIds.push(sId);
+          } else {
+            track.seriesIds = track.seriesIds.filter((id) => id !== sId);
+          }
+          markUnsaved(section.slug);
+          renderTextEditor(section);
+        });
+      });
+
+      const addTrackBtn = panel.querySelector('#btn-add-about-track');
+      if (addTrackBtn) {
+        addTrackBtn.addEventListener('click', () => {
+          section.aboutMap = section.aboutMap || { series: [], tracks: [] };
+          section.aboutMap.tracks.push({
+            id: `track-${Date.now()}`,
+            name: 'New Circuit',
+            lat: -37.85,
+            lon: 144.97,
+            dx: 0,
+            dy: 0,
+            seriesIds: [],
+          });
+          markUnsaved(section.slug);
+          renderTextEditor(section);
+        });
+      }
+
+      panel.querySelectorAll('.btn-del-about-track').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const idx = Number(btn.dataset.tIdx);
+          const removed = section.aboutMap?.tracks?.[idx];
+          if (removed && confirm(`Remove track "${removed.name}"?`)) {
+            section.aboutMap.tracks.splice(idx, 1);
+            markUnsaved(section.slug);
+            renderTextEditor(section);
+          }
+        });
+      });
+    }
+
+    function renderFrames() {
+      const section = getCurrentSection();
+      if (!section) return;
+
+      updateActiveTabHighlight();
+      updateActionButtonsState();
+      renderTextEditor(section);
+      sectionViewTitle.textContent = `${section.title} (${section.group})`;
+
+      const dropzoneSectionEl = document.getElementById('dropzone-section');
+      const waterfallSectionEl = document.getElementById('waterfall-section');
+      if (section.isTextOnly) {
+        dropzoneSectionEl.classList.add('hidden');
+        waterfallSectionEl.classList.add('hidden');
+        addFrameBtn.classList.add('hidden');
+        statsCounter.textContent = `Editing text copy for "${section.title}"`;
+      } else {
+        dropzoneSectionEl.classList.remove('hidden');
+        waterfallSectionEl.classList.remove('hidden');
+        addFrameBtn.classList.toggle('hidden', section.slug === 'about-photo');
+      }
+
+      const profile = getOptimizationProfile(section.slug);
+      optimizerProfileLabel.textContent = profile.label;
+
+      // Show & populate Portfolio Cover Card section on Gallery Pages only
+      const coverSectionEl = document.getElementById('portfolio-cover-section');
+      const coverPreviewImg = document.getElementById('cover-preview-img');
+      const coverPreviewScaleWrap = document.getElementById('cover-preview-scale-wrap');
+      const coverPreviewTitle = document.getElementById('cover-preview-title');
+      if (section.group === 'Gallery Pages' && section.cover) {
+        coverSectionEl.classList.remove('hidden');
+        coverPreviewImg.src = section.cover.src;
+        const cx = typeof section.cover.focusX === 'number' ? section.cover.focusX : 50;
+        const cy = typeof section.cover.focusY === 'number' ? section.cover.focusY : 50;
+        const cz = typeof section.cover.zoom === 'number' ? section.cover.zoom : 1;
+        coverPreviewImg.style.objectPosition = `${cx}% ${cy}%`;
+        coverPreviewScaleWrap.style.transform = `scale(${cz})`;
+        coverPreviewScaleWrap.style.transformOrigin = `${cx}% ${cy}%`;
+        coverPreviewTitle.textContent = section.title;
+      } else {
+        coverSectionEl.classList.add('hidden');
+      }
+
+      let landscapes = 0;
+      let portraits = 0;
+      section.frames.forEach((f) => {
+        if (f.aspect === 'portrait') portraits++;
+        else landscapes++;
+      });
+
+      if (!section.isTextOnly) {
+        statsCounter.textContent = `${section.frames.length} Frames in "${section.title}" (${landscapes} Landscape 4:3, ${portraits} Portrait 3:4)`;
+      }
+
+      waterfall.innerHTML = '';
+
+      section.frames.forEach((frame, idx) => {
+        const isPortrait = frame.aspect === 'portrait';
+        const card = document.createElement('div');
+        card.className =
+          'frame-card group relative overflow-hidden rounded-xl border border-secondary/25 bg-surface-900/90 shadow-lg transition-all duration-200 hover:border-secondary/60 hover:shadow-2xl';
+        card.setAttribute('draggable', 'true');
+        card.dataset.index = idx;
+
+        const isHeroSection = section.slug === 'home-hero';
+        const focusX = typeof frame.focusX === 'number' ? frame.focusX : 65;
+        const focusY = typeof frame.focusY === 'number' ? frame.focusY : 50;
+        const zoom = typeof frame.zoom === 'number' ? frame.zoom : 1;
+
+        const editFramingBtnHtml = isHeroSection
+          ? `<button
+               type="button"
+               class="btn-edit-framing shrink-0 inline-flex items-center gap-1 rounded-md border border-secondary/40 bg-surface-950/90 px-2.5 py-1 text-[11px] font-medium text-white backdrop-blur-sm transition hover:bg-surface-850 hover:border-white"
+               title="Visually adjust crop position for the Hero Carousel"
+             >
+               <span>✂ Edit</span>
+             </button>`
+          : '';
+
+        const conversionBadgeHtml = frame.conversionMeta
+          ? `<div class="pointer-events-auto inline-flex items-center gap-2 rounded-md border border-emerald-500/40 bg-surface-950/90 px-2 py-1 text-[10px] font-medium text-emerald-300 shadow-md backdrop-blur-sm">
+               <span>${frame.conversionMeta}</span>
+               <a href="${frame.src}" download="${frame.fileName || `frame-${idx + 1}.webp`}" class="underline hover:text-white" title="Download optimized WebP for Azure">.webp ↓</a>
+             </div>`
+          : '';
+
+        card.innerHTML = `
+          <!-- Card Header & Drag Bar -->
+          <div class="flex h-9 items-center justify-between border-b border-secondary/15 bg-surface-950/70 px-3 text-xs">
+            <div class="flex items-center gap-2 cursor-grab active:cursor-grabbing handle">
+              <span class="text-secondary/50">⠿</span>
+              <span class="font-semibold text-surface-100">#${String(idx + 1).padStart(2, '0')}</span>
+            </div>
+            
+            <div class="flex items-center gap-1.5">
+              <!-- Reorder buttons -->
+              <button type="button" class="btn-move-up rounded p-1 text-secondary transition hover:bg-secondary/15 hover:text-white" title="Move frame earlier">
+                ←
+              </button>
+              <button type="button" class="btn-move-down rounded p-1 text-secondary transition hover:bg-secondary/15 hover:text-white" title="Move frame later">
+                →
+              </button>
+              <button type="button" class="btn-delete rounded p-1 text-red-400 transition hover:bg-red-950/50 hover:text-red-300" title="Delete frame">
+                ✕
+              </button>
+            </div>
+          </div>
+
+          <!-- Image Preview with Exact Aspect Ratio -->
+          <div class="relative w-full overflow-hidden ${isPortrait ? 'aspect-[3/4]' : 'aspect-[4/3]'} bg-stone-950">
+            <img
+              src="${frame.src}"
+              alt="${frame.alt || 'Frame preview'}"
+              style="${isHeroSection ? `object-position: ${focusX}% ${focusY}%; transform: scale(${zoom}); transform-origin: ${focusX}% ${focusY}%;` : ''}"
+              class="h-full w-full object-cover transition duration-300 group-hover:scale-102"
+            />
+            
+            <!-- Quick Floating Action Overlay (zero layout impact) -->
+            <div class="absolute inset-0 flex flex-col justify-between p-2.5 bg-gradient-to-t from-black/80 via-transparent to-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+              <!-- Orientation Toggle Badge -->
+              <div class="flex justify-start">
+                <button
+                  type="button"
+                  class="btn-toggle-aspect inline-flex items-center gap-1.5 rounded-full border border-secondary/40 bg-surface-950/90 px-2.5 py-1 text-[11px] font-semibold text-white shadow-md backdrop-blur-sm transition hover:bg-white hover:text-surface-950"
+                  title="Click to toggle between 4:3 (Horizontal) and 3:4 (Vertical)"
+                >
+                  <span>⇄</span>
+                  <span>${isPortrait ? '3:4 Portrait' : '4:3 Landscape'}</span>
+                </button>
+              </div>
+
+              <!-- Bottom Overlay Row: Optimization Pill (if any), Edit Framing (Hero only) & Replace Button -->
+              <div class="flex items-end justify-between gap-2">
+                <div class="min-w-0">
+                  ${conversionBadgeHtml}
+                </div>
+                <div class="flex items-center gap-1.5 shrink-0">
+                  ${editFramingBtnHtml}
+                  <button
+                    type="button"
+                    class="btn-replace shrink-0 inline-flex items-center gap-1.5 rounded-md border border-secondary/40 bg-surface-950/90 px-2.5 py-1 text-[11px] font-medium text-white backdrop-blur-sm transition hover:bg-surface-850 hover:border-white"
+                  >
+                    <span>📷 Replace</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card Footer & Description / Alt (fixed height so grid stays uniform) -->
+          <div class="p-2.5 bg-surface-900/60">
+            <input
+              type="text"
+              value="${frame.alt || ''}"
+              placeholder="Frame title / description..."
+              class="frame-alt-input h-8 w-full rounded border border-secondary/20 bg-surface-950/80 px-2.5 text-xs text-surface-100 placeholder:text-secondary/50 focus:border-surface-100 focus:outline-none"
+            />
+          </div>
+        `;
+
+        // Event Listeners for Card
+        const toggleAspectBtn = card.querySelector('.btn-toggle-aspect');
+        toggleAspectBtn.addEventListener('click', () => {
+          frame.aspect = frame.aspect === 'portrait' ? 'landscape' : 'portrait';
+          markUnsaved();
+          renderFrames();
+        });
+
+        const replaceBtn = card.querySelector('.btn-replace');
+        replaceBtn.addEventListener('click', () => {
+          replaceTargetIndex = idx;
+          singleReplaceInput.click();
+        });
+
+        const editFramingBtn = card.querySelector('.btn-edit-framing');
+        if (editFramingBtn) {
+          editFramingBtn.addEventListener('click', () => {
+            openHeroCropModal(idx);
+          });
+        }
+
+        const moveUpBtn = card.querySelector('.btn-move-up');
+        moveUpBtn.addEventListener('click', () => {
+          if (idx > 0) {
+            const temp = section.frames[idx];
+            section.frames[idx] = section.frames[idx - 1];
+            section.frames[idx - 1] = temp;
+            markUnsaved();
+            renderFrames();
+          }
+        });
+
+        const moveDownBtn = card.querySelector('.btn-move-down');
+        moveDownBtn.addEventListener('click', () => {
+          if (idx < section.frames.length - 1) {
+            const temp = section.frames[idx];
+            section.frames[idx] = section.frames[idx + 1];
+            section.frames[idx + 1] = temp;
+            markUnsaved();
+            renderFrames();
+          }
+        });
+
+        const deleteBtn = card.querySelector('.btn-delete');
+        deleteBtn.addEventListener('click', () => {
+          if (confirm(`Remove Frame #${idx + 1}?`)) {
+            section.frames.splice(idx, 1);
+            markUnsaved();
+            renderFrames();
+          }
+        });
+
+        const altInput = card.querySelector('.frame-alt-input');
+        altInput.addEventListener('input', (e) => {
+          frame.alt = e.target.value;
+          markUnsaved();
+        });
+
+        // Drag & Drop Reordering
+        card.addEventListener('dragstart', (e) => {
+          draggedIndex = idx;
+          card.classList.add('opacity-40');
+          e.dataTransfer.effectAllowed = 'move';
+        });
+
+        card.addEventListener('dragend', () => {
+          card.classList.remove('opacity-40');
+          document.querySelectorAll('.frame-card').forEach((c) => c.classList.remove('border-white', 'scale-[1.02]'));
+        });
+
+        card.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          e.dataTransfer.dropEffect = 'move';
+          card.classList.add('border-white');
+        });
+
+        card.addEventListener('dragleave', () => {
+          card.classList.remove('border-white');
+        });
+
+        card.addEventListener('drop', (e) => {
+          e.preventDefault();
+          card.classList.remove('border-white');
+          if (draggedIndex !== null && draggedIndex !== idx) {
+            const movedItem = section.frames.splice(draggedIndex, 1)[0];
+            section.frames.splice(idx, 0, movedItem);
+            draggedIndex = null;
+            markUnsaved();
+            renderFrames();
+          }
+        });
+
+        waterfall.appendChild(card);
+      });
+    }
+
+    // Category Tabs Switching
+    categoryTabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        currentSectionSlug = tab.dataset.slug;
+        sessionStorage.setItem('darkroom_active_slug', currentSectionSlug);
+        history.replaceState(null, '', `#${currentSectionSlug}`);
+        renderFrames();
+      });
+    });
+
+    // Single File Replace Handler with Automatic WebP Optimization
+    singleReplaceInput.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (file && replaceTargetIndex !== null) {
+        const targetIdx = replaceTargetIndex;
+        replaceTargetIndex = null;
+        singleReplaceInput.value = '';
+
+        try {
+          showToast('Optimizing image to WebP...');
+          const section = getCurrentSection();
+          const optimized = await optimizeImageForAzure(file, section.slug);
+          section.frames[targetIdx].src = optimized.src;
+          section.frames[targetIdx].dataUrl = optimized.dataUrl;
+          section.frames[targetIdx].alt = optimized.alt;
+          section.frames[targetIdx].aspect = section.slug === 'about-photo' ? 'portrait' : optimized.aspect;
+          section.frames[targetIdx].fileName = optimized.fileName;
+          section.frames[targetIdx].conversionMeta = optimized.conversionMeta;
+          markUnsaved();
+          renderFrames();
+          showToast(`Optimized & replaced (${optimized.conversionMeta})`);
+        } catch (err) {
+          showToast('Could not process image file');
+        }
+      }
+    });
+
+    // Helper for processing multiple files (sorted naturally by filename so order is deterministic)
+    async function handleBulkFiles(fileList) {
+      const files = Array.from(fileList)
+        .filter((f) => f.type.startsWith('image/'))
+        .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' }));
+      if (files.length === 0) return;
+
+      const section = getCurrentSection();
+      showToast(`Optimizing ${files.length} photo(s) to WebP...`);
+
+      let addedCount = 0;
+      for (const file of files) {
+        try {
+          const optimized = await optimizeImageForAzure(file, section.slug);
+          if (section.slug === 'about-photo') {
+            section.frames[0] = {
+              src: optimized.src,
+              dataUrl: optimized.dataUrl,
+              alt: optimized.alt,
+              aspect: 'portrait',
+              fileName: optimized.fileName,
+              conversionMeta: optimized.conversionMeta,
+              focusX: 50,
+              focusY: 50,
+              zoom: 1,
+            };
+            addedCount = 1;
+            break;
+          }
+          section.frames.push({
+            src: optimized.src,
+            dataUrl: optimized.dataUrl,
+            alt: optimized.alt,
+            aspect: optimized.aspect,
+            fileName: optimized.fileName,
+            conversionMeta: optimized.conversionMeta,
+          });
+          addedCount++;
+        } catch (err) {
+          // Skip invalid files
+        }
+      }
+
+      if (addedCount > 0) {
+        markUnsaved();
+        renderFrames();
+        showToast(`Optimized & added ${addedCount} WebP frame(s)!`);
+      }
+    }
+
+    // Bulk File Input Change Handler
+    bulkFileInput.addEventListener('change', async (e) => {
+      await handleBulkFiles(e.target.files);
+      bulkFileInput.value = '';
+    });
+
+    // Drag & Drop File Support directly onto the Dropzone
+    dropzone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropzone.classList.add('border-surface-100', 'bg-surface-900/80');
+    });
+
+    dropzone.addEventListener('dragleave', () => {
+      dropzone.classList.remove('border-surface-100', 'bg-surface-900/80');
+    });
+
+    dropzone.addEventListener('drop', async (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('border-surface-100', 'bg-surface-900/80');
+      if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        await handleBulkFiles(e.dataTransfer.files);
+      }
+    });
+
+    // Add Empty / Placeholder Frame Button
+    addFrameBtn.addEventListener('click', () => {
+      const section = getCurrentSection();
+      section.frames.push({
+        src: '/images/photos/apex-motion-01.svg',
+        alt: 'New frame',
+        aspect: section.frames.length % 2 === 0 ? 'landscape' : 'portrait',
+      });
+      markUnsaved();
+      renderFrames();
+      showToast('New frame added to bottom!');
+    });
+
+    // Reset Button
+    resetBtn.addEventListener('click', () => {
+      if (confirm('Discard all unsaved edits and reset to saved state?')) {
+        sectionsState = JSON.parse(JSON.stringify(initialSectionsData));
+        unsavedSlugs.clear();
+        Object.keys(localStorage).forEach((k) => {
+          if (k.startsWith('darkroom_preview_')) localStorage.removeItem(k);
+        });
+        updateActionButtonsState();
+        renderFrames();
+        showToast('Reset to saved configuration');
+      }
+    });
+
+    async function saveCurrentSection() {
+      saveBtnText.textContent = 'Saving...';
+      const section = getCurrentSection();
+      sessionStorage.setItem('darkroom_active_slug', section.slug);
+      history.replaceState(null, '', `#${section.slug}`);
+      try {
+        const res = await fetch('/api/darkroom/save', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            slug: section.slug,
+            frames: section.frames,
+            cover: section.cover || null,
+            copy: section.copy || null,
+            experiences: section.experiences || null,
+            seriesMeta: section.seriesMeta || null,
+            aboutMap: section.aboutMap || null,
+          }),
+        });
+
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || !data.ok) {
+          throw new Error(data.error || `Server returned ${res.status}`);
+        }
+
+        // Update local state with persisted disk URLs so blob URLs are replaced
+        if (Array.isArray(data.frames)) {
+          section.frames = data.frames;
+        }
+        if (data.cover) {
+          section.cover = data.cover;
+        }
+        localStorage.removeItem(`darkroom_preview_${section.slug}`);
+        renderFrames();
+        markSaved(section.slug);
+        showToast(`Saved & synced "${section.title}" to site!`);
+        return true;
+      } catch (err) {
+        updateActionButtonsState();
+        showToast(`Save failed: ${err.message || 'Could not reach save API'}`);
+        return false;
+      }
+    }
+
+    // Save & Publish Button
+    savePublishBtn.addEventListener('click', async () => {
+      if (!unsavedSlugs.has(currentSectionSlug)) return;
+      await saveCurrentSection();
+    });
+
+    // Preview Live: open a non-destructive draft preview tab with saved + current unsaved changes
+    viewLiveBtn.addEventListener('click', () => {
+      const section = getCurrentSection();
+      if (!section || !unsavedSlugs.has(section.slug)) return;
+
+      const draftPayload = {
+        slug: section.slug,
+        title: section.title,
+        copy: section.copy || null,
+        experiences: section.experiences || null,
+        seriesMeta: section.seriesMeta || null,
+        aboutMap: section.aboutMap || null,
+        frames: section.frames.map((f) => ({
+          ...f,
+          src: f.dataUrl || f.src,
+        })),
+        cover: section.cover
+          ? {
+              ...section.cover,
+              src: section.cover.dataUrl || section.cover.src,
+            }
+          : null,
+      };
+
+      try {
+        localStorage.setItem(`darkroom_preview_${section.slug}`, JSON.stringify(draftPayload));
+      } catch (err) {
+        showToast('Draft too large for browser preview storage; save to view live.');
+        return;
+      }
+
+      const rawUrl = section.liveUrl || '/';
+      const [pathPart, hashPart] = rawUrl.split('#');
+      const sep = pathPart.includes('?') ? '&' : '?';
+      const previewUrl = `${pathPart}${sep}preview=draft${hashPart ? `#${hashPart}` : ''}`;
+      window.open(previewUrl, '_blank', 'noopener');
+    });
+
+    // Portfolio Cover Card Actions (Gallery Series only)
+    const coverEditFramingBtn = document.getElementById('cover-edit-framing-btn');
+    const coverReplaceBtn = document.getElementById('cover-replace-btn');
+    const coverReplaceInput = document.getElementById('cover-replace-input');
+
+    coverEditFramingBtn.addEventListener('click', () => {
+      openCoverCropModal();
+    });
+
+    coverReplaceBtn.addEventListener('click', () => {
+      coverReplaceInput.click();
+    });
+
+    coverReplaceInput.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      coverReplaceInput.value = '';
+      if (!file) return;
+      try {
+        showToast('Optimizing cover image to WebP...');
+        const section = getCurrentSection();
+        // Use high-res hero-class profile (max 2400px) for full-width Portfolio cover banners
+        const optimized = await optimizeImageForAzure(file, 'home-hero');
+        section.cover = {
+          src: optimized.src,
+          dataUrl: optimized.dataUrl,
+          fileName: optimized.fileName,
+          focusX: 50,
+          focusY: 50,
+          zoom: 1,
+        };
+        markUnsaved(section.slug);
+        renderFrames();
+        showToast('Cover image optimized & staged!');
+      } catch (err) {
+        showToast('Could not process cover image');
+      }
+    });
+
+    // Visual Framing Modal State & Drag-to-Pan Logic (shared by Hero Carousel & Portfolio Cover Card)
+    const heroCropModal = document.getElementById('hero-crop-modal');
+    const heroCropTitle = document.getElementById('hero-crop-title');
+    const heroCropStage = document.getElementById('hero-crop-stage');
+    const heroCropMaskWrap = document.getElementById('hero-crop-mask-wrap');
+    const coverCropGradient = document.getElementById('cover-crop-gradient');
+    const heroCropGuide = document.getElementById('hero-crop-guide');
+    const coverCropGuide = document.getElementById('cover-crop-guide');
+    const coverCropGuideTitle = document.getElementById('cover-crop-guide-title');
+    const heroCropImg = document.getElementById('hero-crop-img');
+    const heroCropCoords = document.getElementById('hero-crop-coords');
+    const heroCropZoom = document.getElementById('hero-crop-zoom');
+    const heroCropZoomVal = document.getElementById('hero-crop-zoom-val');
+    const heroCropReset = document.getElementById('hero-crop-reset');
+    const heroCropCancel = document.getElementById('hero-crop-cancel');
+    const heroCropApply = document.getElementById('hero-crop-apply');
+
+    let cropMode = 'hero'; // 'hero' | 'cover'
+    let cropTargetIndex = null;
+    let cropFocusX = 65;
+    let cropFocusY = 50;
+    let cropZoom = 1;
+    let isPanningCrop = false;
+    let panStartX = 0;
+    let panStartY = 0;
+    let panInitialFocusX = 65;
+    let panInitialFocusY = 50;
+
+    function updateCropPreview() {
+      const x = Math.max(0, Math.min(100, Math.round(cropFocusX)));
+      const y = Math.max(0, Math.min(100, Math.round(cropFocusY)));
+      const z = Math.max(1, Math.min(2, Number(cropZoom)));
+      cropFocusX = x;
+      cropFocusY = y;
+      cropZoom = z;
+      heroCropImg.style.objectPosition = `${x}% ${y}%`;
+      heroCropImg.style.transform = `scale(${z})`;
+      heroCropImg.style.transformOrigin = `${x}% ${y}%`;
+      heroCropZoom.value = String(z);
+      heroCropZoomVal.textContent = `${Math.round(z * 100)}%`;
+      heroCropCoords.textContent = `${x}% · ${y}% · ${Math.round(z * 100)}%`;
+    }
+
+    function openHeroCropModal(idx) {
+      const section = getCurrentSection();
+      const frame = section.frames[idx];
+      if (!frame) return;
+
+      cropMode = 'hero';
+      cropTargetIndex = idx;
+      heroCropTitle.textContent = 'Adjust Hero Carousel Framing';
+      heroCropStage.classList.remove('aspect-[11/2]');
+      heroCropStage.classList.add('aspect-[5/2]');
+      heroCropMaskWrap.style.webkitMaskImage =
+        'radial-gradient(ellipse 82% 115% at 10% 22%, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.28) 14%, rgba(0,0,0,0.36) 28%, rgba(0,0,0,0.50) 42%, rgba(0,0,0,0.68) 56%, rgba(0,0,0,0.85) 70%, rgba(0,0,0,0.96) 84%, black 95%), linear-gradient(to bottom, transparent 0%, black 6%, black 92%, transparent 100%)';
+      heroCropMaskWrap.style.maskImage = heroCropMaskWrap.style.webkitMaskImage;
+      coverCropGradient.classList.add('hidden');
+      heroCropGuide.classList.remove('hidden');
+      coverCropGuide.classList.add('hidden');
+
+      cropFocusX = typeof frame.focusX === 'number' ? frame.focusX : 65;
+      cropFocusY = typeof frame.focusY === 'number' ? frame.focusY : 50;
+      cropZoom = typeof frame.zoom === 'number' ? frame.zoom : 1;
+      heroCropImg.src = frame.src;
+      updateCropPreview();
+
+      heroCropModal.classList.remove('hidden');
+      heroCropModal.classList.add('flex');
+    }
+
+    function openCoverCropModal() {
+      const section = getCurrentSection();
+      if (!section.cover) return;
+
+      cropMode = 'cover';
+      cropTargetIndex = null;
+      heroCropTitle.textContent = `Adjust Portfolio Cover Framing — ${section.title}`;
+      heroCropStage.classList.remove('aspect-[5/2]');
+      heroCropStage.classList.add('aspect-[11/2]');
+      heroCropMaskWrap.style.webkitMaskImage = 'none';
+      heroCropMaskWrap.style.maskImage = 'none';
+      coverCropGradient.classList.remove('hidden');
+      heroCropGuide.classList.add('hidden');
+      coverCropGuide.classList.remove('hidden');
+      coverCropGuideTitle.textContent = section.title;
+
+      cropFocusX = typeof section.cover.focusX === 'number' ? section.cover.focusX : 50;
+      cropFocusY = typeof section.cover.focusY === 'number' ? section.cover.focusY : 50;
+      cropZoom = typeof section.cover.zoom === 'number' ? section.cover.zoom : 1;
+      heroCropImg.src = section.cover.src;
+      updateCropPreview();
+
+      heroCropModal.classList.remove('hidden');
+      heroCropModal.classList.add('flex');
+    }
+
+    function closeHeroCropModal() {
+      heroCropModal.classList.add('hidden');
+      heroCropModal.classList.remove('flex');
+      cropTargetIndex = null;
+      isPanningCrop = false;
+    }
+
+    heroCropStage.addEventListener('pointerdown', (e) => {
+      isPanningCrop = true;
+      panStartX = e.clientX;
+      panStartY = e.clientY;
+      panInitialFocusX = cropFocusX;
+      panInitialFocusY = cropFocusY;
+      heroCropStage.setPointerCapture(e.pointerId);
+    });
+
+    heroCropStage.addEventListener('pointermove', (e) => {
+      if (!isPanningCrop) return;
+      const rect = heroCropStage.getBoundingClientRect();
+      const dxPct = ((e.clientX - panStartX) / rect.width) * 100;
+      const dyPct = ((e.clientY - panStartY) / rect.height) * 100;
+      cropFocusX = panInitialFocusX - dxPct;
+      cropFocusY = panInitialFocusY - dyPct;
+      updateCropPreview();
+    });
+
+    heroCropStage.addEventListener('pointerup', (e) => {
+      isPanningCrop = false;
+      if (heroCropStage.hasPointerCapture(e.pointerId)) {
+        heroCropStage.releasePointerCapture(e.pointerId);
+      }
+    });
+
+    heroCropZoom.addEventListener('input', (e) => {
+      cropZoom = parseFloat(e.target.value) || 1;
+      updateCropPreview();
+    });
+
+    heroCropReset.addEventListener('click', () => {
+      cropFocusX = 50;
+      cropFocusY = 50;
+      cropZoom = 1;
+      updateCropPreview();
+    });
+
+    heroCropCancel.addEventListener('click', closeHeroCropModal);
+
+    heroCropModal.addEventListener('click', (e) => {
+      if (e.target === heroCropModal) closeHeroCropModal();
+    });
+
+    heroCropApply.addEventListener('click', () => {
+      const section = getCurrentSection();
+      if (cropMode === 'cover' && section.cover) {
+        section.cover.focusX = cropFocusX;
+        section.cover.focusY = cropFocusY;
+        section.cover.zoom = cropZoom;
+        markUnsaved(section.slug);
+        renderFrames();
+        closeHeroCropModal();
+        showToast(`Staged cover framing (${cropFocusX}% · ${cropFocusY}% · ${Math.round(cropZoom * 100)}%)`);
+      } else if (cropTargetIndex !== null) {
+        section.frames[cropTargetIndex].focusX = cropFocusX;
+        section.frames[cropTargetIndex].focusY = cropFocusY;
+        section.frames[cropTargetIndex].zoom = cropZoom;
+        markUnsaved(section.slug);
+        renderFrames();
+        closeHeroCropModal();
+        showToast(`Staged hero framing (${cropFocusX}% · ${cropFocusY}% · ${Math.round(cropZoom * 100)}%)`);
+      } else {
+        closeHeroCropModal();
+      }
+    });
+
+    // Check Azure SWA session identity (/.auth/me) when hosted on Azure; silently skipped on localhost
+    (async function checkAzureAdminSession() {
+      try {
+        const res = await fetch('/.auth/me');
+        if (!res.ok) return;
+        const data = await res.json().catch(() => null);
+        const principal = data && data.clientPrincipal;
+        if (principal && principal.userDetails) {
+          const badge = document.getElementById('darkroom-auth-badge');
+          const userEl = document.getElementById('darkroom-auth-user');
+          if (badge && userEl) {
+            userEl.textContent = principal.userDetails;
+            badge.classList.remove('hidden');
+            badge.classList.add('inline-flex');
+          }
+        }
+      } catch (_) {}
+    })();
+
+    // Initial Render
+    renderFrames();
+  </script>
+</BaseLayout>
