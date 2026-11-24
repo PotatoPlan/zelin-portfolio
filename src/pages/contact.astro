@@ -17,7 +17,7 @@ const portfolioPdfUrl = resolveMediaUrl(siteConfig.portfolioDownload.fileUrl);
   <section class="mx-auto max-w-6xl px-6 pt-12 pb-16">
     <div class="mx-auto max-w-3xl">
       <!-- Intro -->
-      <div>
+      <div data-reveal data-reveal-delay="40">
         <h1 class="font-display text-4xl text-surface-100 sm:text-5xl">
           Let’s work together.
         </h1>
@@ -27,7 +27,7 @@ const portfolioPdfUrl = resolveMediaUrl(siteConfig.portfolioDownload.fileUrl);
       </div>
 
       <!-- Interactive Contact Form -->
-      <div class="mt-10">
+      <div data-reveal data-reveal-delay="150" class="mt-10">
         <div class="card-surface p-7 sm:p-10">
           <h2 class="font-display text-3xl text-stone-100">Send a Message</h2>
 
@@ -101,10 +101,13 @@ const portfolioPdfUrl = resolveMediaUrl(siteConfig.portfolioDownload.fileUrl);
 </BaseLayout>
 
 <script>
-  const form = document.getElementById('contact-form') as HTMLFormElement | null;
-  const statusEl = document.getElementById('form-status');
+  function setupContactForm() {
+    const form = document.getElementById('contact-form') as HTMLFormElement | null;
+    const statusEl = document.getElementById('form-status');
+    if (!form || !statusEl || form.dataset.bound === '1') return;
+    form.dataset.bound = '1';
 
-  form?.addEventListener('submit', async (e) => {
+    form.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (!form || !statusEl) return;
 
@@ -170,5 +173,9 @@ const portfolioPdfUrl = resolveMediaUrl(siteConfig.portfolioDownload.fileUrl);
         'block rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-xs text-red-300';
       statusEl.textContent = `Could not submit automatically. Please email ${fallbackEmail} directly.`;
     }
-  });
+    });
+  }
+
+  setupContactForm();
+  document.addEventListener('site:page-load', setupContactForm);
 </script>

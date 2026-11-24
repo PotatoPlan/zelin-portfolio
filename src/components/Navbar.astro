@@ -28,6 +28,7 @@ const portfolioPdfUrl = resolveMediaUrl(siteConfig.portfolioDownload.fileUrl);
         return (
           <a
             href={item.href}
+            data-nav-href={item.href}
             class:list={[
               'rounded-full px-4 py-1.5 text-xs font-medium transition-all duration-200',
               isActive
@@ -101,4 +102,28 @@ const portfolioPdfUrl = resolveMediaUrl(siteConfig.portfolioDownload.fileUrl);
   btn?.addEventListener('click', () => {
     menu?.classList.toggle('hidden');
   });
+
+  function syncActiveNav() {
+    const pathname = window.location.pathname;
+    document.querySelectorAll<HTMLAnchorElement>('a[data-nav-href]').forEach((link) => {
+      const target = link.dataset.navHref || '/';
+      const isActive = target === '/' ? pathname === '/' : pathname.startsWith(target);
+      link.classList.remove(
+        'bg-surface-100',
+        'text-surface-950',
+        'shadow-sm',
+        'text-secondary',
+        'hover:text-surface-100',
+        'hover:bg-secondary/10'
+      );
+      if (isActive) {
+        link.classList.add('bg-surface-100', 'text-surface-950', 'shadow-sm');
+      } else {
+        link.classList.add('text-secondary', 'hover:text-surface-100', 'hover:bg-secondary/10');
+      }
+    });
+    menu?.classList.add('hidden');
+  }
+
+  document.addEventListener('site:page-load', syncActiveNav);
 </script>

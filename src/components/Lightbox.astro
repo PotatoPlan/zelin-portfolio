@@ -74,6 +74,8 @@
     }
 
     document.querySelectorAll<HTMLElement>('[data-lightbox-src]').forEach((trigger) => {
+      if (trigger.dataset.lightboxBound) return;
+      trigger.dataset.lightboxBound = '1';
       trigger.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -85,17 +87,30 @@
       });
     });
 
-    closeBtn?.addEventListener('click', closeLightbox);
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) closeLightbox();
-    });
+    if (!modal.dataset.lightboxModalBound) {
+      modal.dataset.lightboxModalBound = '1';
+      closeBtn?.addEventListener('click', closeLightbox);
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeLightbox();
+      });
+    }
 
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
-        closeLightbox();
-      }
-    });
+    if (!(window as any).__lightboxKeyBound) {
+      (window as any).__lightboxKeyBound = true;
+      document.addEventListener('keydown', (e) => {
+        const activeModal = document.getElementById('photo-lightbox');
+        if (e.key === 'Escape' && activeModal && !activeModal.classList.contains('hidden')) {
+          activeModal.classList.add('hidden');
+          activeModal.classList.remove('flex');
+          activeModal.setAttribute('aria-hidden', 'true');
+          const activeImg = document.getElementById('lightbox-img') as HTMLImageElement | null;
+          if (activeImg) activeImg.src = '';
+          document.body.style.overflow = '';
+        }
+      });
+    }
   }
 
   setupLightbox();
+  document.addEventListener('site:page-load', setupLightbox);
 </script>

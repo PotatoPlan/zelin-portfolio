@@ -7,6 +7,9 @@ import homeGalleryData from '../../data/homeGallery.json';
 import aboutProfileData from '../../data/aboutProfile.json';
 import pageCopy from '../../data/pageCopy.json';
 import aboutSeriesMap from '../../data/aboutSeriesMap.json';
+import packageJson from '../../../package.json';
+
+const appVersion = packageJson.version;
 
 const allSeries = (await getCollection('photos')).sort(
   (a, b) => a.data.order - b.data.order
@@ -193,6 +196,13 @@ const allSections = [
               <span class="rounded-full border border-secondary/30 bg-surface-900 px-2.5 py-0.5 text-[11px] font-medium text-secondary">
                 Private Curation Desk
               </span>
+              <span
+                id="darkroom-version-badge"
+                class="rounded-full border border-secondary/25 bg-surface-900/70 px-2 py-0.5 font-mono text-[11px] font-medium text-secondary-light"
+                title="Application version (SemVer)"
+              >
+                v{appVersion}
+              </span>
               <span id="darkroom-auth-badge" class="hidden items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-950/30 px-2.5 py-0.5 text-[11px] text-emerald-300">
                 <span id="darkroom-auth-user"></span>
                 <a href="/.auth/logout?post_logout_redirect_uri=/" class="underline hover:text-white">Sign Out</a>
@@ -247,7 +257,7 @@ const allSections = [
     <!-- Main Workspace -->
     <main class="mx-auto max-w-7xl px-4 sm:px-8 pt-8">
       <!-- Category Switcher Tabs Grouped -->
-      <section class="mb-8 space-y-5">
+      <section data-reveal data-reveal-delay="40" class="mb-8 space-y-5">
         <!-- Homepage Group -->
         <div>
           <div class="flex items-center justify-between pb-2">
@@ -291,7 +301,7 @@ const allSections = [
       <section id="text-editor-panel" class="mb-8 hidden"></section>
 
       <!-- Drag & Drop Bulk Upload Zone + Azure WebP Conversion Pipeline -->
-      <section id="dropzone-section" class="mb-8">
+      <section id="dropzone-section" data-reveal data-reveal-delay="130" class="mb-8">
         <div class="mb-2.5 flex flex-wrap items-center justify-between gap-2">
           <div class="flex items-center gap-2">
             <span class="inline-flex h-2 w-2 rounded-full bg-emerald-400"></span>
@@ -374,7 +384,7 @@ const allSections = [
       </section>
 
       <!-- Waterfall Masonry Visual Workspace -->
-      <section id="waterfall-section">
+      <section id="waterfall-section" data-reveal data-reveal-delay="210">
         <div class="mb-4 flex flex-wrap items-center justify-between gap-4 border-b border-secondary/15 pb-3">
           <div class="flex items-center gap-2">
             <h2 id="section-view-title" class="text-lg font-semibold tracking-tight text-white">Waterfall Grid Layout</h2>

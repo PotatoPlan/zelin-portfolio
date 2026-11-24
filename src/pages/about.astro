@@ -31,7 +31,7 @@ const seriesList = (await getCollection('photos'))
 >
   <div class="mx-auto max-w-6xl px-4 sm:px-6 pt-12 pb-20 space-y-20">
     <!-- Section 1: Introduction of Myself -->
-    <section aria-labelledby="about-intro-heading">
+    <section data-reveal data-reveal-delay="40" aria-labelledby="about-intro-heading">
       <div class="grid gap-10 lg:grid-cols-12 lg:items-start">
         <div class="lg:col-span-7 space-y-5">
           <div>
@@ -95,7 +95,7 @@ const seriesList = (await getCollection('photos'))
     </section>
 
     <!-- Section 2: Interactive Circuit Map (Middle East to New Zealand) -->
-    <section aria-labelledby="series-worked-heading" class="border-t border-secondary/15 pt-14">
+    <section data-reveal data-reveal-delay="140" aria-labelledby="series-worked-heading" class="border-t border-secondary/15 pt-14">
       <div class="mb-6">
         <h2 id="series-worked-heading" class="font-display text-3xl font-medium tracking-tight text-surface-100 sm:text-4xl">
           Series I’ve Worked With

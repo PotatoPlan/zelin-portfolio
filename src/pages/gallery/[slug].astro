@@ -76,14 +76,14 @@ const galleryImages = [
     </a>
 
     <!-- Header: Title only -->
-    <header class="mt-4">
+    <header data-reveal data-reveal-delay="40" class="mt-4">
       <h1 class="font-display text-4xl text-surface-100 sm:text-5xl lg:text-6xl font-medium tracking-tight">
         {title}
       </h1>
     </header>
 
     <!-- Waterfall (Masonry) Gallery (30 images, 4:3 landscape & 3:4 portrait) -->
-    <div id="gallery-waterfall" data-series-slug={entry.slug} class="mt-8 sm:mt-10 columns-1 sm:columns-2 lg:columns-3 gap-4 sm:gap-6">
+    <div id="gallery-waterfall" data-reveal data-reveal-delay="150" data-series-slug={entry.slug} class="mt-8 sm:mt-10 columns-1 sm:columns-2 lg:columns-3 gap-4 sm:gap-6">
       {galleryImages.map((item, index) => {
         const isPortrait = item.aspect === 'portrait';
         return (

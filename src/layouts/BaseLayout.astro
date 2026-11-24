@@ -38,6 +38,9 @@ const pageTitle = title === siteConfig.title ? title : `${title} | ${siteConfig.
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
+    <script is:inline>
+      document.documentElement.classList.add('js-reveal');
+    </script>
   </head>
   <body class="min-h-screen bg-surface-950 text-surface-100 antialiased selection:bg-secondary/30 flex flex-col">
     <!-- Subtle architectural silver zenith glow -->
@@ -45,10 +48,298 @@ const pageTitle = title === siteConfig.title ? title : `${title} | ${siteConfig.
 
     <Navbar />
 
-    <main class="relative z-10 flex-1">
+    <main id="page-main" class="relative z-10 flex-1 page-main-swap">
       <slot />
     </main>
 
     <Footer />
+
+    <script is:inline>
+      (function initSiteNavigationAndReveals() {
+        let activeObserver = null;
+
+        function runScrollReveals() {
+          if (activeObserver) {
+            activeObserver.disconnect();
+            activeObserver = null;
+          }
+
+          const els = Array.from(document.querySelectorAll('[data-reveal]'));
+          if (!els.length) return;
+
+          const revealEl = (el) => {
+            if (el.classList.contains('is-revealed')) return;
+            const delay = Number(el.getAttribute('data-reveal-delay') || '0');
+            if (delay > 0) {
+              el.style.transitionDelay = `${delay}ms`;
+            }
+            el.classList.add('is-revealed');
+            const clearHint = () => {
+              el.style.willChange = 'auto';
+              el.style.transitionDelay = '';
+            };
+            el.addEventListener('transitionend', clearHint, { once: true });
+            window.setTimeout(clearHint, 900 + delay);
+          };
+
+          if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) {
+            els.forEach(revealEl);
+            return;
+          }
+
+          activeObserver = new IntersectionObserver(
+            (entries) => {
+              entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                  revealEl(entry.target);
+                  activeObserver?.unobserve(entry.target);
+                }
+              });
+            },
+            { threshold: 0.06, rootMargin: '0px 0px -28px 0px' }
+          );
+
+          requestAnimationFrame(() => {
+            const vh = window.innerHeight || document.documentElement.clientHeight;
+            els.forEach((el) => {
+              const rect = el.getBoundingClientRect();
+              if (rect.top < vh * 0.96) {
+                revealEl(el);
+              } else {
+                activeObserver?.observe(el);
+              }
+            });
+          });
+        }
+
+        window.__runScrollReveals = runScrollReveals;
+        runScrollReveals();
+
+        const mainEl = document.getElementById('page-main');
+        if (!mainEl) return;
+
+        const pageCache = new Map();
+        const loadedAssets = new Set();
+        document.querySelectorAll('head link[rel="stylesheet"], script[type="module"][src]').forEach((node) => {
+          const key = node.getAttribute('href') || node.getAttribute('src');
+          if (key) loadedAssets.add(key);
+        });
+        const loadedInlineStyles = new Set(
+          Array.from(document.querySelectorAll('head style')).map((s) => s.getAttribute('data-vite-dev-id') || s.textContent || '')
+        );
+
+        let navSeq = 0;
+
+        const isSwappablePath = (pathname) =>
+          !pathname.startsWith('/darkroom') && !pathname.startsWith('/.auth');
+
+        const getInternalTarget = (anchor) => {
+          if (!anchor || !anchor.href) return null;
+          if (anchor.hasAttribute('download') || anchor.hasAttribute('data-no-pjax')) return null;
+          if (anchor.target && anchor.target !== '_self') return null;
+          const rawHref = anchor.getAttribute('href') || '';
+          if (rawHref.startsWith('#') || rawHref.startsWith('mailto:') || rawHref.startsWith('tel:')) return null;
+          let url;
+          try {
+            url = new URL(anchor.href, window.location.href);
+          } catch (_) {
+            return null;
+          }
+          if (url.origin !== window.location.origin) return null;
+          if (!isSwappablePath(window.location.pathname) || !isSwappablePath(url.pathname)) return null;
+          if (url.pathname === window.location.pathname && url.search === window.location.search && url.hash) return null;
+          return url;
+        };
+
+        const fetchPageHtml = (urlStr) => {
+          const key = new URL(urlStr, window.location.href).pathname + new URL(urlStr, window.location.href).search;
+          if (new URL(urlStr, window.location.href).search.includes('preview=draft')) {
+            return fetch(urlStr, { credentials: 'same-origin' }).then((r) => {
+              if (!r.ok) throw new Error(`HTTP ${r.status}`);
+              return r.text();
+            });
+          }
+          if (!pageCache.has(key)) {
+            const p = fetch(urlStr, { credentials: 'same-origin' }).then((r) => {
+              if (!r.ok) throw new Error(`HTTP ${r.status}`);
+              return r.text();
+            }).catch((err) => {
+              pageCache.delete(key);
+              throw err;
+            });
+            pageCache.set(key, p);
+          }
+          return pageCache.get(key);
+        };
+
+        const syncHeadAssets = async (doc) => {
+          const pending = [];
+
+          doc.querySelectorAll('head link[rel="stylesheet"]').forEach((link) => {
+            const href = link.getAttribute('href');
+            if (!href || loadedAssets.has(href)) return;
+            loadedAssets.add(href);
+            const clone = document.createElement('link');
+            clone.rel = 'stylesheet';
+            clone.href = href;
+            pending.push(
+              new Promise((resolve) => {
+                clone.onload = resolve;
+                clone.onerror = resolve;
+              })
+            );
+            document.head.appendChild(clone);
+          });
+
+          doc.querySelectorAll('head style').forEach((style) => {
+            const key = style.getAttribute('data-vite-dev-id') || style.textContent || '';
+            if (!key || loadedInlineStyles.has(key)) return;
+            loadedInlineStyles.add(key);
+            const clone = document.createElement('style');
+            if (style.hasAttribute('data-vite-dev-id')) {
+              clone.setAttribute('data-vite-dev-id', style.getAttribute('data-vite-dev-id'));
+            }
+            clone.textContent = style.textContent;
+            document.head.appendChild(clone);
+          });
+
+          doc.querySelectorAll('script[type="module"][src]').forEach((script) => {
+            const src = script.getAttribute('src');
+            if (!src || loadedAssets.has(src)) return;
+            loadedAssets.add(src);
+            const clone = document.createElement('script');
+            clone.type = 'module';
+            clone.src = src;
+            pending.push(
+              new Promise((resolve) => {
+                clone.onload = resolve;
+                clone.onerror = resolve;
+              })
+            );
+            document.head.appendChild(clone);
+          });
+
+          if (pending.length) {
+            await Promise.all(pending);
+          }
+        };
+
+        const runMainInlineScripts = () => {
+          mainEl.querySelectorAll('script').forEach((oldScript) => {
+            if (oldScript.type === 'module' && oldScript.src) return;
+            const newScript = document.createElement('script');
+            Array.from(oldScript.attributes).forEach((attr) => {
+              newScript.setAttribute(attr.name, attr.value);
+            });
+            newScript.textContent = oldScript.textContent;
+            oldScript.parentNode?.replaceChild(newScript, oldScript);
+          });
+        };
+
+        const navigateTo = async (url, { push = true } = {}) => {
+          const currentSeq = ++navSeq;
+          const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+          try {
+            const fadeDelay = reducedMotion ? 0 : 150;
+            if (!reducedMotion) {
+              mainEl.classList.add('page-leave');
+            }
+
+            const [html] = await Promise.all([
+              fetchPageHtml(url.href),
+              new Promise((resolve) => window.setTimeout(resolve, fadeDelay)),
+            ]);
+
+            if (currentSeq !== navSeq) return;
+
+            const doc = new DOMParser().parseFromString(html, 'text/html');
+            const newMain = doc.getElementById('page-main');
+            if (!newMain) {
+              window.location.href = url.href;
+              return;
+            }
+
+            await syncHeadAssets(doc);
+            if (currentSeq !== navSeq) return;
+
+            document.title = doc.title || document.title;
+            document.body.style.overflow = '';
+
+            if (push) {
+              window.history.pushState({ pjax: true }, '', url.href);
+            }
+
+            mainEl.innerHTML = newMain.innerHTML;
+            runMainInlineScripts();
+
+            if (url.hash) {
+              const targetEl = document.getElementById(url.hash.slice(1));
+              if (targetEl) targetEl.scrollIntoView({ behavior: 'auto' });
+              else window.scrollTo(0, 0);
+            } else {
+              window.scrollTo(0, 0);
+            }
+
+            mainEl.classList.remove('page-leave');
+            runScrollReveals();
+            document.dispatchEvent(new CustomEvent('site:page-load'));
+          } catch (_) {
+            window.location.href = url.href;
+          }
+        };
+
+        document.addEventListener('pointerenter', (e) => {
+          const anchor = e.target instanceof Element ? e.target.closest('a') : null;
+          const url = getInternalTarget(anchor);
+          if (url) fetchPageHtml(url.href).catch(() => {});
+        }, true);
+
+        document.addEventListener('focusin', (e) => {
+          const anchor = e.target instanceof Element ? e.target.closest('a') : null;
+          const url = getInternalTarget(anchor);
+          if (url) fetchPageHtml(url.href).catch(() => {});
+        });
+
+        document.addEventListener('click', (e) => {
+          if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+          const anchor = e.target instanceof Element ? e.target.closest('a') : null;
+          const url = getInternalTarget(anchor);
+          if (!url) return;
+          if (url.pathname === window.location.pathname && url.search === window.location.search) return;
+
+          e.preventDefault();
+          navigateTo(url, { push: true });
+        });
+
+        window.addEventListener('popstate', () => {
+          const url = new URL(window.location.href);
+          if (!isSwappablePath(url.pathname)) {
+            window.location.reload();
+            return;
+          }
+          navigateTo(url, { push: false });
+        });
+
+        window.addEventListener('pageshow', () => {
+          mainEl.classList.remove('page-leave');
+        });
+
+        // Prewarm top nav destinations once idle so switching tabs is instantaneous
+        const warmNav = () => {
+          document.querySelectorAll('a[data-nav-href]').forEach((a) => {
+            const url = getInternalTarget(a);
+            if (url && url.pathname !== window.location.pathname) {
+              fetchPageHtml(url.href).catch(() => {});
+            }
+          });
+        };
+        if ('requestIdleCallback' in window) {
+          window.requestIdleCallback(warmNav, { timeout: 1200 });
+        } else {
+          window.setTimeout(warmNav, 450);
+        }
+      })();
+    </script>
   </body>
 </html>

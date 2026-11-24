@@ -27,11 +27,11 @@ const galleryGridPhotos = homeGalleryData;
 
 <BaseLayout>
   <!-- Hero Section with Left-to-Right Carousel Fade -->
-  <section class="relative overflow-hidden min-h-[460px] sm:aspect-[5/2] flex flex-col justify-start border-b border-secondary/10">
+  <section data-reveal data-reveal-delay="40" class="relative overflow-hidden min-h-[460px] sm:aspect-[5/2] flex flex-col justify-start border-b border-secondary/10">
     <HeroCarousel />
 
     <div class="relative z-10 mx-auto max-w-6xl w-full px-4 sm:px-6 pt-14 sm:pt-20 pb-16">
-      <div class="w-full lg:max-w-[44%] drop-shadow-[0_2px_10px_rgba(0,0,0,0.65)]">
+      <div data-reveal-child style="transition-delay: 140ms;" class="w-full lg:max-w-[44%] drop-shadow-[0_2px_10px_rgba(0,0,0,0.65)]">
         <h1 id="home-hero-heading" class="font-display text-[clamp(0.95rem,3vw,2.25rem)] font-medium leading-none tracking-tight text-white whitespace-nowrap">
           {pageCopy.homeHero.heading}
         </h1>
@@ -60,7 +60,7 @@ const galleryGridPhotos = homeGalleryData;
   </section>
 
   <!-- Gallery Grid Section (3 columns, 4 rows = 12 items, sharp unrounded corners) -->
-  <section class="mx-auto max-w-6xl px-4 sm:px-6 py-7 sm:py-9">
+  <section data-reveal data-reveal-delay="180" class="mx-auto max-w-6xl px-4 sm:px-6 py-7 sm:py-9">
     <div>
       <h2 class="font-display text-3xl text-surface-100 sm:text-4xl">
         Gallery
@@ -89,7 +89,7 @@ const galleryGridPhotos = homeGalleryData;
   </section>
 
   <!-- Agency Overview -->
-  <section class="mx-auto max-w-6xl px-4 sm:px-6 py-7 sm:py-9">
+  <section data-reveal data-reveal-delay="100" class="mx-auto max-w-6xl px-4 sm:px-6 py-7 sm:py-9">
     <div class="card-surface p-8 sm:p-10 lg:p-12">
       <div class="grid gap-8 lg:grid-cols-12 lg:items-center">
         <!-- Left: Logo Section (centred, not too big) -->

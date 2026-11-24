@@ -187,7 +187,12 @@ const slides: Slide[] = homeHeroData;
     }
   }
 
+  let heroCleanup: (() => void) | null = null;
+
   function setupHeroCarousel() {
+    heroCleanup?.();
+    heroCleanup = null;
+
     const root = document.getElementById('hero-carousel-root');
     if (!root) return;
 
@@ -293,7 +298,7 @@ const slides: Slide[] = homeHeroData;
     heroSection?.addEventListener('mouseleave', startTimer);
 
     // Keyboard support when focused
-    document.addEventListener('keydown', (e) => {
+    const handleKeydown = (e: KeyboardEvent) => {
       if (document.activeElement && heroSection?.contains(document.activeElement)) {
         if (e.key === 'ArrowRight') {
           nextSlide();
@@ -303,11 +308,18 @@ const slides: Slide[] = homeHeroData;
           startTimer();
         }
       }
-    });
+    };
+    document.addEventListener('keydown', handleKeydown);
+
+    heroCleanup = () => {
+      stopTimer();
+      document.removeEventListener('keydown', handleKeydown);
+    };
 
     // Start auto-cycling
     startTimer();
   }
 
   setupHeroCarousel();
+  document.addEventListener('site:page-load', setupHeroCarousel);
 </script>

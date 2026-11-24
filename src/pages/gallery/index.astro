@@ -16,14 +16,14 @@ const allSeries = (await getCollection('photos')).sort(
 >
   <section class="mx-auto max-w-6xl px-6 pt-12 pb-16">
     <!-- Header -->
-    <div class="max-w-3xl">
+    <div data-reveal data-reveal-delay="40" class="max-w-3xl">
       <h1 id="portfolio-page-heading" class="font-display text-4xl text-surface-100 sm:text-5xl">
         {pageCopy.portfolioHeader.heading}
       </h1>
     </div>
 
     <!-- Series List View (1 card per row) -->
-    <div id="series-grid" class="mt-10 flex flex-col gap-5">
+    <div id="series-grid" data-reveal data-reveal-delay="150" class="mt-10 flex flex-col gap-5">
       {allSeries.map((entry) => (
         <PhotoCard entry={entry} />
       ))}
